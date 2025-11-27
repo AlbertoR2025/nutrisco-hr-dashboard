@@ -5,7 +5,6 @@ import plotly.express as px
 
 # IMPORTS LIMPIOS (SIN importlib.reload → evita errores en la nube)
 from utils.data_loader import load_data
-from utils.kpi_calculator import calculate_kpis
 
 # ==================== CONFIGURACIÓN ====================
 st.set_page_config(
