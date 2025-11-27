@@ -4,3 +4,5 @@ plotly
 openpyxl
 requests
 python-dotenv
+gradio>=4.0.0
+requests>=2.25.0
