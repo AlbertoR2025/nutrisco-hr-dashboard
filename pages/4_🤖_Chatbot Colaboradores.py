@@ -191,6 +191,6 @@ if pregunta := st.chat_input("Escribe tu consulta aquí..."):
 st.markdown("""
 <div class="footer">
     <br>
-    Inteligencia Artificial al servicio de las personas – Nutrisco © 2025<br>
-   </div>
+    Inteligencia Artificial al servicio de las personas – Nutrisco  © 2025
+</div>
 """, unsafe_allow_html=True)
