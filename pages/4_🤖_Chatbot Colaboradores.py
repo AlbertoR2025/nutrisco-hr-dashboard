@@ -8,67 +8,62 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# ==================== ELIMINAR 100% AVATARES, IMAGEN Y CORONA ====================
+# ==================== CONFIGURACIÓN INICIAL CRÍTICA ====================
+st.set_page_config(
+    page_title="Chatbot RR.HH. Nutrisco", 
+    page_icon="💬", 
+    layout="centered",
+    initial_sidebar_state="collapsed"  # ← IMPORTANTE: Colapsar sidebar
+)
+
+# ==================== CSS NUCLEAR - ELIMINAR TODOS LOS ELEMENTOS STREAMLIT ====================
 st.markdown("""
 <style>
-    /* ELIMINAR COMPLETAMENTE AVATARES (IMAGEN Y CORONA) */
-    div[data-testid="stChatMessageAvatar"],
-    div[data-testid="stChatMessage"] > div > div > div > div > div > img,
-    div[data-testid="stChatMessage"] > div > div > div > div > div > svg,
-    .stChatMessage [data-testid="stAvatar"],
-    .stChatMessage img,
-    .stChatMessage svg {
+    /* ELIMINAR ABSOLUTAMENTE TODO ELEMENTO DE STREAMLIT */
+    [data-testid="stAppViewContainer"] header {display: none !important;}
+    [data-testid="stHeader"] {display: none !important;}
+    [data-testid="stToolbar"] {display: none !important;}
+    [data-testid="collapsedControl"] {display: none !important;}
+    .stDeployButton {display: none !important;}
+    footer {display: none !important;}
+    
+    /* ELIMINAR AVATARES DEL CHAT COMPLETAMENTE */
+    [data-testid="stChatMessage"] [data-testid="stAvatar"] {
         display: none !important;
-        width: 0 !important;
-        height: 0 !important;
+        width: 0px !important;
+        height: 0px !important;
         visibility: hidden !important;
     }
     
-    /* ELIMINAR EL ESPACIO DE AVATARES */
-    div[data-testid="stChatMessage"] > div > div > div {
-        gap: 0 !important;
-        padding-left: 0 !important;
-        padding-right: 0 !important;
+    /* ELIMINAR EL CONTENEDOR DE AVATARES */
+    [data-testid="stChatMessage"] > div > div:first-child {
+        display: none !important;
+        min-width: 0px !important;
+        width: 0px !important;
     }
     
-    /* ELIMINAR CORONAS Y BADGES ESPECÍFICAMENTE */
-    div[class*="crown"],
-    div[class*="Crown"],
-    svg[class*="crown"] {
+    /* ELIMINAR CUALQUIER IMAGEN O SVG EN EL CHAT */
+    [data-testid="stChatMessage"] img,
+    [data-testid="stChatMessage"] svg {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+    }
+    
+    /* AJUSTAR EL ESPACIO DE MENSAJES SIN AVATAR */
+    [data-testid="stChatMessage"] > div {
+        gap: 0px !important;
+        padding-left: 0px !important;
+        padding-right: 0px !important;
+    }
+    
+    /* ELIMINAR CUALQUIER ELEMENTO CON CLASE AVATAR */
+    [class*="avatar"] {
         display: none !important;
     }
-</style>
-""", unsafe_allow_html=True)
-
-# ==================== ELIMINAR TODO EL BRANDING DE STREAMLIT ====================
-st.markdown("""
-<style>
-    div[data-testid="stToolbar"] {display: none !important;}
-    div[data-testid="collapsedControl"] {display: none !important;}
-    button[title="Deploy"] {display: none !important;}
-    button[title="View source code"] {display: none !important;}
-    header {visibility: hidden !important;}
-    footer {visibility: hidden !important;}
-    .stDeployButton {display: none !important;}
-    section[data-testid="stSidebar"] + div {padding-top: 0 !important;}
-    .stChatFloatingInputContainer {padding-bottom: 0px !important;}
-    .main > div {padding-top: 0rem !important;}
-</style>
-""", unsafe_allow_html=True)
-
-# ... (el resto de tu código se mantiene igual)
-
-API_KEY = os.getenv("OPENAI_API_KEY")
-if not API_KEY:
-    st.error("Falta OPENAI_API_KEY en .env o en Streamlit Secrets")
-    st.stop()
-
-# ==================== ESTILO VISUAL NUTRISCO ====================
-st.set_page_config(page_title="Chatbot RR.HH. Nutrisco", page_icon="speech_balloon", layout="centered")
-
-st.markdown("""
-<style>
-    .main {background-color: #0e1117; padding: 2rem;}
+    
+    /* ESTILOS PARA LA APP */
+    .main {background-color: #0e1117; padding: 1rem;}
     .user-message {
         background: #262730; color: white; border-radius: 18px;
         padding: 14px 18px; margin: 12px 0; max-width: 80%; margin-left: auto;
@@ -92,6 +87,11 @@ st.markdown("""
     .footer {text-align: center; margin-top: 4rem; color: #94a3b8; font-size: 0.95rem;}
 </style>
 """, unsafe_allow_html=True)
+
+API_KEY = os.getenv("OPENAI_API_KEY")
+if not API_KEY:
+    st.error("Falta OPENAI_API_KEY en .env o en Streamlit Secrets")
+    st.stop()
 
 # ==================== CABECERA ====================
 st.markdown("""
@@ -159,14 +159,17 @@ if pregunta := st.chat_input("Escribe tu consulta aquí..."):
         """, unsafe_allow_html=True)
 
     # Guardar historial
-    nuevo = pd.DataFrame([{"Fecha": datetime.now().strftime("%d/%m/%Y %H:%M"), "Pregunta": pregunta, "Respuesta": respuesta}])
-    archivo = "data/historial_chatbot.xlsx"
-    if os.path.exists(archivo):
-        historial = pd.read_excel(archivo)
-        historial = pd.concat([historial, nuevo], ignore_index=True)
-    else:
-        historial = nuevo
-    historial.to_excel(archivo, index=False)
+    try:
+        nuevo = pd.DataFrame([{"Fecha": datetime.now().strftime("%d/%m/%Y %H:%M"), "Pregunta": pregunta, "Respuesta": respuesta}])
+        archivo = "data/historial_chatbot.xlsx"
+        if os.path.exists(archivo):
+            historial = pd.read_excel(archivo)
+            historial = pd.concat([historial, nuevo], ignore_index=True)
+        else:
+            historial = nuevo
+        historial.to_excel(archivo, index=False)
+    except Exception as e:
+        pass  # Silenciar errores de archivo
 
     st.rerun()
 
