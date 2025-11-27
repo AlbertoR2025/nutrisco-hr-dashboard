@@ -14,9 +14,27 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-header, footer, [data-testid="stToolbar"], [data-testid="stDeployButton"],
-.stDeployButton, [data-testid="stStatusWidget"], [data-testid="stDecoration"] {
+/* Ocultar elementos Streamlit de manera agresiva */
+header, footer, 
+[data-testid="stToolbar"], 
+[data-testid="stDeployButton"],
+[data-testid="stDecoration"],
+[data-testid="stStatusWidget"],
+.stDeployButton,
+button[title*="Deploy"],
+button[title*="View"],
+button[title*="Manage app"],
+a[href*="github"],
+a[href*="streamlit"],
+[data-testid="stSidebarNav"],
+section[data-testid="stSidebar"] > div:first-child {
     display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    width: 0 !important;
+    position: absolute !important;
+    left: -9999px !important;
 }
 
 .stApp {background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);}
@@ -68,6 +86,54 @@ header, footer, [data-testid="stToolbar"], [data-testid="stDeployButton"],
     .user, .bot {max-width: 85%; padding: 11px 16px; font-size: 0.9rem;}
 }
 </style>
+
+<script>
+// Eliminar elementos de Streamlit de forma permanente y agresiva
+(function() {
+    function removeStreamlitElements() {
+        const selectorsToRemove = [
+            'header',
+            'footer',
+            '[data-testid="stToolbar"]',
+            '[data-testid="stDeployButton"]',
+            '[data-testid="stDecoration"]',
+            '[data-testid="stStatusWidget"]',
+            '.stDeployButton',
+            'button[title*="Deploy"]',
+            'button[title*="View"]',
+            'button[title*="Manage"]',
+            'a[href*="github"]',
+            'a[href*="streamlit"]',
+            '[data-testid="stSidebarNav"]',
+            'section[data-testid="stSidebar"] > div:first-child'
+        ];
+        
+        selectorsToRemove.forEach(selector => {
+            document.querySelectorAll(selector).forEach(element => {
+                element.remove();
+            });
+        });
+    }
+    
+    // Ejecutar inmediatamente
+    removeStreamlitElements();
+    
+    // Ejecutar cuando el DOM esté listo
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', removeStreamlitElements);
+    }
+    
+    // Ejecutar cada 500ms para elementos que se cargan dinámicamente
+    setInterval(removeStreamlitElements, 500);
+    
+    // Observador de mutaciones para elementos nuevos
+    const observer = new MutationObserver(removeStreamlitElements);
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+})();
+</script>
 """, unsafe_allow_html=True)
 
 API_KEY = os.getenv("OPENAI_API_KEY")
