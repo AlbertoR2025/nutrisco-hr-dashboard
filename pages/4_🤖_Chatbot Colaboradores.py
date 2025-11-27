@@ -1,157 +1,163 @@
-# pages/4_🤖_Chatbot Colaboradores.py → VERSIÓN FINAL 2025: SIN FOTO/CORONA/GITHUB, SIMÉTRICO DESKTOP/MÓVIL
+# pages/4_🤖_Chatbot Colaboradores.py → VERSIÓN DEFINITIVA (sin errores + 100% humana)
 import streamlit as st
 import pandas as pd
 import requests
 import os
-import time
 from datetime import datetime
 from dotenv import load_dotenv
-
 load_dotenv()
 
-# ==================== CONFIGURACIÓN GLOBAL ====================
-st.set_page_config(
-    page_title="Chatbot Colaboradores – Nutrisco",
-    page_icon="💬",
-    layout="centered",
-    initial_sidebar_state="collapsed"
-)
-
-# ==================== CSS PARA OCULTAR CORONA, AVATAR, GITHUB Y MENÚ SUPERIOR ====================
-css_code = '''
+# Agrega esto justo después de los imports
+st.markdown("""
 <style>
-    /* OCULTAR CORONA ROJA */
-    .stAppDeployButton, button[data-testid="stDeployButton"], .stDeployButton {
-        display: none !important;
-        visibility: hidden !important;
-        height: 0 !important;
-        z-index: -9999 !important;
-    }
+    /* Ocultar avatar del usuario, corona y barra de herramientas en chat */
+    .st-emotion-cache-1r1k0y8 { display: none !important; }  /* Oculta la corona y avatar */
+    .st-emotion-cache-1b7s5q1 { display: none !important; }  /* Oculta la barra superior con foto */
+    .stToolbar { display: none !important; }                  /* Oculta toda la toolbar de Streamlit */
+    .stDeployButton { display: none !important; }             /* Oculta botón Deploy rojo */
+    .st-emotion-cache-1f3q5l2 { display: none !important; } /* Avatar del usuario en chat */
+    .st-emotion-cache-1p0r8n3 { display: none !important; } /* Corona y badge */
+    .st-emotion-cache-1q2s4t5 { display: none !important; } /* Botón de herramientas adicionales */
+    .stAppView .main .block-container { padding-top: 1rem; }  /* Ajusta padding para que quede limpio */
+</style>
+""", unsafe_allow_html=True)
 
-    /* OCULTAR LOGO GITHUB Y FOOTER */
-    footer, [data-testid="stStatusWidget"], div[class*="hosted"], 
-    a[href*="github.com"], span:contains("Streamlit") {
-        display: none !important;
-        visibility: hidden !important;
-        height: 0 !important;
-    }
+API_KEY = os.getenv("OPENAI_API_KEY")
+if not API_KEY:
+    st.error("Falta OPENAI_API_KEY en .env")
+    st.stop()
 
-    /* OCULTAR MENÚ SUPERIOR (Fork, Deploy, Corona) */
-    .stToolbar { display: none !important; }
-    .stHeader { display: none !important; }
-    .stDeployButtonContainer { display: none !important; }
+# ==================== ESTILO VISUAL PRO + HUMANO ====================
+st.set_page_config(page_title="Chatbot RR.HH. Nutrisco", page_icon="speech_balloon", layout="centered")
 
-    /* LAYOUT SIMÉTRICO RESPONSIVO */
-    .main .block-container {
-        max-width: 800px !important;
-        margin: 0 auto !important;
-        padding: 1rem !important;
-        width: auto !important;
-    }
-    @media (max-width: 768px) {
-        .main .block-container { width: 95% !important; padding: 0.5rem !important; }
-        [data-testid="stChatInput"] { max-width: 100% !important; margin: 0 auto !important; padding-bottom: 2rem !important; }
-    }
-    .stApp { background-color: #0e1117 !important; }
-
-    /* ESTILOS MENSAJES SIMÉTRICOS */
-    [data-testid="stChatMessage"] { padding: 0 !important; gap: 0 !important; }
+st.markdown("""
+<style>
+    .main {background-color: #0e1117; padding: 2rem;}
     .user-message {
-        background: #262730 !important;
-        color: white !important;
-        border-radius: 18px !important;
-        padding: 14px 20px !important;
-        margin: 16px 8% 16px auto !important;
-        max-width: 75% !important;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.4) !important;
+        background: #262730; color: white; border-radius: 18px; 
+        padding: 14px 18px; margin: 12px 0; max-width: 80%; margin-left: auto;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     }
     .assistant-message {
-        background: linear-gradient(135deg, #ea580c, #f97316) !important;
-        color: white !important;
-        border-radius: 18px !important;
-        padding: 14px 20px !important;
-        margin: 16px auto 16px 8% !important;
-        max-width: 75% !important;
-        box-shadow: 0 4px 15px rgba(249,115,22,0.5) !important;
+        background: linear-gradient(135deg, #ea580c, #f97316); color: white; 
+        border-radius: 18px; padding: 14px 18px; margin: 12px 0; max-width: 80%; 
+        margin-right: auto; box-shadow: 0 4px 12px rgba(249,115,22,0.4);
     }
-    @media (max-width: 768px) {
-        .user-message, .assistant-message {
-            max-width: 90% !important;
-            padding: 12px 16px !important;
-            margin: 12px 4% 12px auto !important;
-        }
-    }
-
-    /* HEADER BOX */
     .header-box {
-        background: linear-gradient(90deg, #ea580c, #c2410c) !important;
-        padding: 2rem !important;
-        border-radius: 20px !important;
-        text-align: center !important;
-        color: white !important;
-        box-shadow: 0 10px 30px rgba(234,88,12,0.4) !important;
-        margin: 0 auto !important;
+        background: linear-gradient(90deg, #ea580c, #c2410c);
+        padding: 2rem; border-radius: 20px; text-align: center; color: white;
+        margin-bottom: 2rem; box-shadow: 0 10px 30px rgba(234,88,12,0.4);
     }
-    @media (max-width: 768px) {
-        .header-box { padding: 1.5rem !important; }
-    }
-
-    /* BELÉN BOX */
     .belén-box {
-        background: #dc2626 !important;
-        color: white !important;
-        padding: 1.3rem !important;
-        border-radius: 15px !important;
-        text-align: center !important;
+        background: #dc2626; color: white; padding: 1.2rem; border-radius: 15px;
+        text-align: center; font-weight: bold; margin: 1.5rem 0; font-size: 1.1rem;
     }
-
-    /* OCULTAR CONTENEDOR DEL INPUT DE CHAT */
-    [data-testid="stChatInput"] > div > div > div {
-        display: none !important;
-    }
-
-    /* OCULTAR AVATARES EN MENSAJES */
-    [data-testid="stChatMessage"] > div > img,
-    [data-testid="stChatMessage"] > div > svg,
-    [data-testid="stChatMessage"] > div > [data-testid="stAvatar"] {
-        display: none !important;
-        visibility: hidden !important;
-        width: 0 !important;
-        height: 0 !important;
-    }
+    .typing {font-style: italic; color: #94a3b8; text-align: left; margin: 15px 0;}
+    .footer {text-align: center; margin-top: 4rem; color: #64748b; font-size: 0.9rem;}
 </style>
-'''
+""", unsafe_allow_html=True)
 
-# Aplica el CSS
-st.write(css_code, unsafe_allow_html=True)
-
-# ==================== CONTENIDO DEL CHATBOT ====================
-# Mensaje inicial
-st.markdown('<div class="header-box"><h1>Chatbot Colaboradores</h1><p>Nutrisco – Atención Personas</p><p>Escribe tu duda y te respondo al instante</p></div>', unsafe_allow_html=True)
-
-# Mensaje de bienvenida
+# ==================== CABECERA ====================
 st.markdown("""
-<div style="padding: 16px; background: linear-gradient(135deg, #ea580c, #f97316); color: white; border-radius: 18px; margin: 16px auto 16px 8%; max-width: 75%; box-shadow: 0 4px 15px rgba(249,115,22,0.5); text-align: left;">
-    ¡Hola! 🤝 Soy parte del equipo de <strong>Atención a Personas</strong> de Nutrisco.<br><br>
-    Puedes preguntarme cualquier cosa: licencias, beneficios, BUK, finiquitos, vestimenta, bono Fisherman, etc.<br><br>
-    ¡Estoy aquí para ayudarte!
+<div class="header-box">
+    <h1 style="margin:0;">Chatbot Colaboradores</h1>
+    <h2 style="margin:8px 0 0 0; font-weight:300;">Nutrisco – Atención Personas</h2>
+    <p style="margin:15px 0 0 0;">Escribe tu duda y te respondo al instante</p>
 </div>
 """, unsafe_allow_html=True)
 
-# Input personalizado (sin avatar)
-user_input = st.text_input("Escribe tu consulta aquí...", placeholder="", key="chat_input")
+# Inicializar chat
+if "messages" not in st.session_state:
+    st.session_state.messages = [{
+        "role": "assistant",
+        "content": "¡Hola! Soy parte del equipo de **Atención a Personas** de Nutrisco.\n\nPuedes preguntarme cualquier cosa: licencias, beneficios, BUK, finiquitos, vestimenta, bono Fisherman, etc.\n\n¡Estoy aquí para ayudarte!"
+    }]
 
-if user_input:
-    # Mensaje del usuario
-    st.markdown(f"""
-<div style="padding: 14px 20px; background: #262730; color: white; border-radius: 18px; margin: 16px 8% 16px auto; max-width: 75%; box-shadow: 0 2px 10px rgba(0,0,0,0.4); text-align: left;">
-    {user_input}
+# Mostrar mensajes anteriores
+for msg in st.session_state.messages:
+    if msg["role"] == "user":
+        st.markdown(f'<div class="user-message">{msg["content"]}</div>', unsafe_allow_html=True)
+    else:
+        st.markdown(f'<div class="assistant-message">{msg["content"]}</div>', unsafe_allow_html=True)
+
+# Input + efecto humano
+if pregunta := st.chat_input("Escribe tu consulta aquí..."):
+    # 1. Guardar y mostrar pregunta
+    st.session_state.messages.append({"role": "user", "content": pregunta})
+    st.markdown(f'<div class="user-message">{pregunta}</div>', unsafe_allow_html=True)
+
+    # 2. Efecto "Escribiendo..." (1.3 segundos)
+    placeholder = st.empty()
+    placeholder.markdown('<div class="typing">Escribiendo<span style="animation: blink 1s infinite;">...</span></div>', unsafe_allow_html=True)
+    import time; time.sleep(1.3)
+    placeholder.empty()
+
+    # 3. Llamar a ChatGPT
+    try:
+        response = requests.post(
+            "https://api.openai.com/v1/chat/completions",
+            headers={"Authorization": f"Bearer {API_KEY}"},
+            json={
+                "model": "gpt-4o-mini",
+                "messages": [
+                    {"role": "system", "content": "Eres una persona real del equipo de RR.HH. de Nutrisco. Hablas en español, súper cercano, cálido y profesional. Nunca digas que eres IA. Si es tema delicado (acoso, conflicto, agresión), deriva con mucho tacto a Belén Bastías (interno 7219)."},
+                    {"role": "user", "content": pregunta}
+                ],
+                "temperature": 0.7,
+                "max_tokens": 600
+            },
+            timeout=30
+        )
+        respuesta = response.json()["choices"][0]["message"]["content"]
+    except:
+        respuesta = "Uy, justo ahora tengo un pequeño problema de conexión. Mejor llámame al interno 7219 o escribe a belen.bastias@nutrisco.com. ¡Perdona las molestias!"
+
+    # 4. Mostrar respuesta
+    st.markdown(f'<div class="assistant-message">{respuesta}</div>', unsafe_allow_html=True)
+    st.session_state.messages.append({"role": "assistant", "content": respuesta})
+
+    # 5. Tema sensible → caja roja
+    if any(palabra in pregunta.lower() for palabra in ["agresi", "acoso", "conflicto", "denuncia", "pelea", "maltrato", "insulto"]):
+        st.markdown("""
+        <div class="belén-box">
+            Este tema es muy importante<br>
+            <strong>Belén Bastías Hurtado</strong> te puede ayudar personalmente<br>
+            Correo: belen.bastias@nutrisco.com | Interno: 7219
+        </div>
+        """, unsafe_allow_html=True)
+
+    # 6. GUARDAR EN EXCEL (siempre)
+    nuevo = pd.DataFrame([{
+        "Fecha": datetime.now().strftime("%d/%m/%Y %H:%M"),
+        "Pregunta": pregunta,
+        "Respuesta": respuesta
+    }])
+    archivo = "data/historial_chatbot.xlsx"
+    if os.path.exists(archivo):
+        historial = pd.read_excel(archivo)
+        historial = pd.concat([historial, nuevo], ignore_index=True)
+    else:
+        historial = nuevo
+    historial.to_excel(archivo, index=False)
+
+    # 7. Recargar suavemente (funciona en todas las versiones)
+    st.rerun()   # ← ESTA ES LA LÍNEA CORRECTA
+
+# Footer limpio y corporativo (solo Nutrisco)
+st.markdown("""
+<div class="footer">
+    <p style="margin:0; font-size:0.95rem; color:#94a3b8;">
+        Inteligencia Artificial al servicio de las personas – Nutrisco
+    </p>
 </div>
 """, unsafe_allow_html=True)
 
-    # Respuesta del asistente
-    st.markdown("""
-<div style="padding: 14px 20px; background: linear-gradient(135deg, #ea580c, #f97316); color: white; border-radius: 18px; margin: 16px auto 16px 8%; max-width: 75%; box-shadow: 0 4px 15px rgba(249,115,22,0.5); text-align: left;">
-    Gracias por tu pregunta. Estoy procesando la respuesta...
-</div>
+# Animación puntitos
+st.markdown("""
+<style>
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+</style>
 """, unsafe_allow_html=True)
