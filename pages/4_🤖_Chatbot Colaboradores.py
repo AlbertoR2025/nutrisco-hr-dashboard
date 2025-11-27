@@ -1,4 +1,4 @@
-# pages/4_🤖_Chatbot Colaboradores.py → VERSIÓN NUCLEAR SIN AVATARES
+# pages/4_🤖_Chatbot Colaboradores.py
 import streamlit as st
 import pandas as pd
 import requests
@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# ==================== CONFIGURACIÓN INICIAL ====================
+# ==================== CONFIGURACIÓN ====================
 st.set_page_config(
     page_title="Chatbot Colaboradores – Nutrisco",
     page_icon="💬",
@@ -17,141 +17,106 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# ==================== CSS NUCLEAR - ELIMINACIÓN TOTAL ====================
+# ==================== CSS MEJORADO - ELIMINAR TODO + INPUT FUNCIONAL ====================
 st.markdown("""
 <style>
-    /* === ELIMINACIÓN TOTAL DE ELEMENTOS STREAMLIT === */
+    /* === ELIMINAR ELEMENTOS STREAMLIT === */
+    header, [data-testid="stHeader"] {display: none !important;}
+    footer, [data-testid="stToolbar"] {display: none !important;}
+    [data-testid="stDeployButton"] {display: none !important;}
     
-    /* 1. ELIMINAR HEADER COMPLETO DE STREAMLIT */
-    header, [data-testid="stHeader"] {
-        display: none !important;
-        visibility: hidden !important;
-        height: 0px !important;
-        max-height: 0px !important;
-    }
-    
-    /* 2. ELIMINAR FOOTER Y ELEMENTOS GITHUB */
-    footer, [data-testid="stStatusWidget"], 
-    [data-testid="stToolbar"], [data-testid="stDeployButton"],
-    .stDeployButton, .stAppDeployButton {
-        display: none !important;
-        visibility: hidden !important;
-        height: 0px !important;
-        opacity: 0 !important;
-    }
-    
-    /* 3. ELIMINAR CORONA Y BOTONES DE DEPLOY */
-    button[title="View app source"], button[title="Deploy this app"],
-    [data-testid="baseButton-secondary"] {
-        display: none !important;
-    }
-    
-    /* 4. ELIMINACIÓN RADICAL DE AVATARES EN MENSAJES */
+    /* === ELIMINAR AVATARES COMPLETAMENTE === */
     [data-testid="stChatMessage"] [data-testid="stAvatar"],
     [data-testid="stChatMessage"] img,
     [data-testid="stChatMessage"] svg,
-    [kind="user"] [data-testid="stAvatar"],
-    [kind="assistant"] [data-testid="stAvatar"] {
-        display: none !important;
-        visibility: hidden !important;
-        width: 0px !important;
-        height: 0px !important;
-        min-width: 0px !important;
-        min-height: 0px !important;
-        opacity: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-    
-    /* 5. ELIMINAR CONTENEDORES DE AVATARES */
-    [data-testid="stChatMessage"] > div > div:first-child,
-    [data-testid="stChatMessage"] > div > div:nth-child(1) {
-        display: none !important;
-        width: 0px !important;
-        min-width: 0px !important;
-        visibility: hidden !important;
-    }
-    
-    /* 6. ELIMINAR AVATAR DEL INPUT DE CHAT */
     [data-testid="stChatInput"] [data-testid="stAvatar"],
     [data-testid="stChatInput"] img,
     [data-testid="stChatInput"] svg {
         display: none !important;
-        visibility: hidden !important;
         width: 0px !important;
         height: 0px !important;
+        visibility: hidden !important;
     }
     
-    /* 7. CORREGIR ESPACIOS SIN AVATARES */
-    [data-testid="stChatMessage"] > div {
-        gap: 0px !important;
-        margin-left: 0px !important;
-        margin-right: 0px !important;
-        padding-left: 0px !important;
-        padding-right: 0px !important;
+    /* === CORREGIR INPUT DE CHAT - VERSIÓN SIMPLIFICADA === */
+    [data-testid="stChatInput"] {
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: 90% !important;
+        max-width: 800px !important;
+        background: #0e1117 !important;
+        padding: 1rem !important;
+        border-top: 1px solid #333 !important;
+        z-index: 9999 !important;
+    }
+    
+    [data-testid="stChatInput"] > div {
+        background: #1e1e1e !important;
+        border: 1px solid #444 !important;
+        border-radius: 25px !important;
+        padding: 8px !important;
+    }
+    
+    [data-testid="stChatInput"] textarea {
+        background: transparent !important;
+        color: white !important;
+        border: none !important;
+        padding: 8px 12px !important;
+    }
+    
+    [data-testid="stChatInput"] textarea:focus {
+        outline: none !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+    
+    [data-testid="stChatInput"] button {
+        background: #ea580c !important;
+        border: none !important;
+        border-radius: 50% !important;
     }
     
     /* === ESTILOS DE LA APLICACIÓN === */
-    
-    /* Fondo de la aplicación */
-    .stApp {
-        background-color: #0e1117 !important;
-    }
-    
-    /* Contenedor principal */
     .main .block-container {
         max-width: 800px;
         margin: 0 auto;
         padding: 1rem;
-        padding-bottom: 100px !important; /* Espacio para el input fijo */
+        padding-bottom: 100px !important;
     }
     
-    /* Mensajes de usuario */
-    .user-message {
-        background: #262730;
-        color: white;
-        border-radius: 18px;
-        padding: 14px 20px;
-        margin: 12px 0 12px auto;
-        max-width: 75%;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+    .stApp {
+        background-color: #0e1117 !important;
     }
     
-    /* Mensajes del asistente */
-    .assistant-message {
-        background: linear-gradient(135deg, #ea580c, #f97316);
-        color: white;
-        border-radius: 18px;
-        padding: 14px 20px;
-        margin: 12px auto 12px 0;
-        max-width: 75%;
-        box-shadow: 0 4px 15px rgba(249,115,22,0.5);
-    }
-    
-    /* Header */
     .header-box {
         background: linear-gradient(90deg, #ea580c, #c2410c);
         padding: 2rem;
         border-radius: 20px;
         text-align: center;
         color: white;
-        box-shadow: 0 10px 30px rgba(234,88,12,0.4);
-        margin: 0 auto 2rem auto;
+        margin-bottom: 2rem;
     }
     
-    /* Box de Belén */
-    .belen-box {
-        background: #dc2626;
+    .user-msg {
+        background: #262730;
         color: white;
-        padding: 1.3rem;
-        border-radius: 15px;
-        text-align: center;
-        font-weight: bold;
-        margin: 2rem auto;
-        box-shadow: 0 4px 15px rgba(220,38,38,0.4);
+        border-radius: 18px;
+        padding: 14px 20px;
+        margin: 12px 0 12px auto;
+        max-width: 75%;
     }
     
-    /* Footer */
+    .assistant-msg {
+        background: linear-gradient(135deg, #ea580c, #f97316);
+        color: white;
+        border-radius: 18px;
+        padding: 14px 20px;
+        margin: 12px auto 12px 0;
+        max-width: 75%;
+    }
+    
     .footer {
         text-align: center;
         margin-top: 3rem;
@@ -159,137 +124,30 @@ st.markdown("""
         padding: 2rem 0;
     }
     
-    /* === CORRECCIÓN CRÍTICA DEL INPUT === */
-    
-    /* Contenedor del input - posicionamiento fijo */
-    [data-testid="stChatInput"] {
-        position: fixed !important;
-        bottom: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        background: #0e1117 !important;
-        padding: 1rem !important;
-        border-top: 1px solid #333 !important;
-        z-index: 9999 !important;
-        display: flex !important;
-        align-items: center !important;
-        gap: 10px !important;
-    }
-    
-    /* Textarea del input - completamente visible */
-    [data-testid="stChatInput"] textarea {
-        flex: 1 !important;
-        background: #1e1e1e !important;
-        color: white !important;
-        border: 1px solid #444 !important;
-        border-radius: 25px !important;
-        padding: 12px 20px !important;
-        font-size: 16px !important;
-        min-height: 50px !important;
-        resize: none !important;
-        display: block !important;
-        visibility: visible !important;
-    }
-    
-    [data-testid="stChatInput"] textarea:focus {
-        outline: none !important;
-        border-color: #ea580c !important;
-        box-shadow: 0 0 0 2px rgba(234, 88, 12, 0.2) !important;
-    }
-    
-    /* Botón de enviar */
-    [data-testid="stChatInput"] button {
-        background: #ea580c !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 50% !important;
-        width: 50px !important;
-        height: 50px !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        cursor: pointer !important;
-    }
-    
-    /* Responsive para móviles */
     @media (max-width: 768px) {
-        .main .block-container {
-            width: 95% !important;
-            padding: 0.5rem !important;
-            padding-bottom: 120px !important;
-        }
-        
-        .user-message, .assistant-message {
-            max-width: 85% !important;
-            padding: 12px 16px !important;
-            margin: 10px 0 !important;
-        }
-        
-        .header-box {
-            padding: 1.5rem !important;
-        }
-        
         [data-testid="stChatInput"] {
-            padding: 0.8rem !important;
+            width: 95% !important;
         }
-        
-        [data-testid="stChatInput"] textarea {
-            padding: 10px 16px !important;
-            font-size: 14px !important;
+        .user-msg, .assistant-msg {
+            max-width: 85%;
         }
     }
 </style>
 
-<!-- JAVASCRIPT DE RESPALDO PARA ELIMINAR ELEMENTOS PERSISTENTES -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Función para eliminar elementos persistentes
-    function eliminarElementosPersistentes() {
-        // Eliminar cualquier avatar residual
-        const avatares = document.querySelectorAll([
-            '[data-testid="stAvatar"]',
-            '[data-testid="stChatMessageAvatar"]',
-            '.stChatMessage img',
-            '.stChatMessage svg',
-            'img[alt*="avatar"]',
-            'svg[data-testid*="avatar"]'
-        ].join(','));
-        
-        avatares.forEach(avatar => {
-            avatar.remove();
-            avatar.style.display = 'none';
-        });
-        
-        // Eliminar footer y elementos GitHub
-        const elementosStreamlit = document.querySelectorAll([
-            'footer',
-            '[data-testid="stToolbar"]',
-            '[data-testid="stDeployButton"]',
-            '[data-testid="stStatusWidget"]',
-            'a[href*="github"]',
-            'button[title*="Deploy"]',
-            'button[title*="View"]'
-        ].join(','));
-        
-        elementosStreamlit.forEach(elemento => {
-            elemento.remove();
-            elemento.style.display = 'none';
-        });
-    }
-    
-    // Ejecutar múltiples veces
-    setTimeout(eliminarElementosPersistentes, 100);
-    setTimeout(eliminarElementosPersistentes, 500);
-    setTimeout(eliminarElementosPersistentes, 1000);
-    setInterval(eliminarElementosPersistentes, 2000);
-});
+// JavaScript para eliminar elementos persistentes
+setTimeout(() => {
+    // Eliminar avatares
+    document.querySelectorAll('[data-testid="stAvatar"]').forEach(el => el.remove());
+    // Eliminar elementos del header
+    document.querySelectorAll('header').forEach(el => el.remove());
+}, 100);
 </script>
 """, unsafe_allow_html=True)
 
-# ==================== INICIALIZACIÓN ====================
+# ==================== LÓGICA DE LA APLICACIÓN ====================
 API_KEY = os.getenv("OPENAI_API_KEY")
 
-# ==================== INTERFAZ PRINCIPAL ====================
 # Header
 st.markdown("""
 <div class="header-box">
@@ -299,42 +157,43 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Mensaje de bienvenida inicial
+# Mensaje de bienvenida
 st.markdown("""
-<div class="assistant-message">
+<div class="assistant-msg">
     <strong>¡Hola! 👋</strong> Soy parte del equipo de <strong>Atención a Personas</strong> de Nutrisco.<br><br>
     Puedes preguntarme cualquier cosa: licencias, beneficios, BUK, finiquitos, vestimenta, bono Fisherman, etc.<br><br>
     ¡Estoy aquí para ayudarte!
 </div>
 """, unsafe_allow_html=True)
 
-# ==================== LÓGICA DEL CHAT ====================
-# Inicializar mensajes
+# ==================== CHAT FUNCTIONALITY ====================
+# Initialize chat history
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Mostrar historial de mensajes
-for msg in st.session_state.messages:
-    if msg["role"] == "user":
-        st.markdown(f'<div class="user-message">{msg["content"]}</div>', unsafe_allow_html=True)
+# Display chat messages
+for message in st.session_state.messages:
+    if message["role"] == "user":
+        st.markdown(f'<div class="user-msg">{message["content"]}</div>', unsafe_allow_html=True)
     else:
-        st.markdown(f'<div class="assistant-message">{msg["content"]}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="assistant-msg">{message["content"]}</div>', unsafe_allow_html=True)
 
-# Input de chat - ESTA PARTE DEBE SER VISIBLE
+# Chat input - ESTA ES LA PARTE CRÍTICA
 user_input = st.chat_input("Escribe tu consulta aquí...")
 
 if user_input:
-    # Agregar mensaje del usuario
+    # Add user message to chat history
     st.session_state.messages.append({"role": "user", "content": user_input})
     
-    # Mostrar mensaje del usuario
-    st.markdown(f'<div class="user-message">{user_input}</div>', unsafe_allow_html=True)
+    # Display user message
+    st.markdown(f'<div class="user-msg">{user_input}</div>', unsafe_allow_html=True)
     
-    # Mostrar indicador de escritura
-    with st.spinner("Escribiendo respuesta..."):
+    # Display assistant response
+    with st.spinner("Pensando..."):
+        # Simulate processing time
         time.sleep(1)
         
-        # Obtener respuesta
+        # Get AI response
         try:
             if API_KEY:
                 response = requests.post(
@@ -345,7 +204,7 @@ if user_input:
                         "messages": [
                             {
                                 "role": "system", 
-                                "content": "Eres un asistente de RR.HH. de Nutrisco. Responde de manera profesional y cercana. Para temas delicados, deriva a Belén Bastías."
+                                "content": "Eres un asistente de RR.HH. de Nutrisco. Responde de manera profesional y cercana."
                             },
                             {"role": "user", "content": user_input}
                         ],
@@ -354,28 +213,19 @@ if user_input:
                     },
                     timeout=30
                 )
-                respuesta = response.json()["choices"][0]["message"]["content"]
+                assistant_response = response.json()["choices"][0]["message"]["content"]
             else:
-                respuesta = "⚠️ Error: No se configuró OPENAI_API_KEY"
+                assistant_response = "Error: No se configuró la API key"
         except Exception as e:
-            respuesta = "⚠️ Error de conexión. Contacta a Belén Bastías: belen.bastias@nutrisco.com"
-        
-        # Agregar y mostrar respuesta
-        st.session_state.messages.append({"role": "assistant", "content": respuesta})
-        st.markdown(f'<div class="assistant-message">{respuesta}</div>', unsafe_allow_html=True)
-        
-        # Detectar temas sensibles
-        temas_sensibles = ["agresi", "acoso", "denuncia", "conflicto", "pelea", "maltrato", "insulto"]
-        if any(p in user_input.lower() for p in temas_sensibles):
-            st.markdown("""
-            <div class="belen-box">
-                💡 <strong>Para este tema específico</strong><br>
-                Contacta directamente a <strong>Belén Bastías Hurtado</strong><br>
-                📧 belen.bastias@nutrisco.com | ☎ Interno: 7219
-            </div>
-            """, unsafe_allow_html=True)
+            assistant_response = "Error de conexión. Contacta a Belén Bastías: belen.bastias@nutrisco.com"
     
-    # Recargar para limpiar input
+    # Add assistant response to chat history
+    st.session_state.messages.append({"role": "assistant", "content": assistant_response})
+    
+    # Display assistant response
+    st.markdown(f'<div class="assistant-msg">{assistant_response}</div>', unsafe_allow_html=True)
+    
+    # Rerun to clear input and show new messages
     st.rerun()
 
 # Footer
