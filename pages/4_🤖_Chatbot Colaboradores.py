@@ -1,4 +1,4 @@
-# pages/4_🤖_Chatbot Colaboradores.py → VERSIÓN FINAL 2025: SIN AVATAR/INPUT AVATAR/CORONA/HOSTED, RESPONSIVO MÓVIL CENTRADO PERFECTO
+# pages/4_🤖_Chatbot Colaboradores.py → VERSIÓN FINAL 2025: SIN AVATAR/CORONA/HOSTED, CENTRADO RESPONSIVO MÓVIL (FIXES DE RELEASE NOTES)
 import streamlit as st
 import pandas as pd
 import requests
@@ -12,52 +12,53 @@ load_dotenv()
 st.set_page_config(
     page_title="Chatbot Colaboradores – Nutrisco",
     page_icon="💬",
-    layout="centered",  # Centrado nativo + CSS para responsivo
-    initial_sidebar_state="collapsed"
+    layout="centered",  # Centrado nativo, con CSS para responsivo
+    initial_sidebar_state="collapsed"  # Sidebar colapsada, pero ícono hamburguesa visible
 )
 
-# ==================== CSS + JS DEFINITIVO 2025: OCULTA TODO (DE FOROS Y RELEASE NOTES) ====================
+# ==================== CSS + JS DEFINITIVO 2025 (DE RELEASE NOTES Y FOROS) ====================
 st.markdown("""
 <style>
-    /* OCULTAR HEADER, MENU, TOOLBAR (estándar 2025) */
-    header, #MainMenu, [data-testid="stToolbar"], [data-testid="collapsedControl"] {display: none !important; visibility: hidden !important; height: 0 !important;}
+    /* OCULTAR HEADER Y TOOLBAR (SIN TOCAR HAMBURGUESA) */
+    [data-testid="stToolbar"] {display: none !important;}
+    [data-testid="collapsedControl"] {display: none !important;}
 
-    /* OCULTAR FOOTER "HOSTED WITH STREAMLIT" Y CORONA ROJA (selectores actualizados nov 2025) */
+    /* OCULTAR FOOTER HOSTED WITH STREAMLIT Y CORONA ROJA (FIX #11896 PARA MÓVIL) */
     footer, [data-testid="stStatusWidget"], div.block-container > footer, div[class*="hosted"], div:contains("Streamlit"),
-    button[data-testid="stDeployButton"], .stDeployButton, [data-testid="stDeployButton"] {display: none !important; visibility: hidden !important; height: 0 !important; z-index: -1 !important; opacity: 0 !important;}
+    button[data-testid="stDeployButton"], .stDeployButton {display: none !important; visibility: hidden !important; height: 0 !important; z-index: -1 !important; opacity: 0 !important;}
 
-    /* OCULTAR AVATAR DEL USUARIO EN CHAT_INPUT Y MENSAJES (móvil/desktop - fix #11891) */
-    [data-testid="stChatInput"] img, [data-testid="stChatInput"] > div > img, [data-testid="stChatMessage"] img[src*="avatar"], [data-testid="stAvatar"],
-    img[alt="user avatar"], .css-h1sjnp img, .e1d0834u0 img, div[class*="css-"][alt*="avatar"] {display: none !important; visibility: hidden !important; width: 0 !important; height: 0 !important; opacity: 0 !important;}
+    /* OCULTAR AVATAR EN CHAT_INPUT Y MENSAJES (FIX #12132 PARA RESIZE MÓVIL) */
+    [data-testid="stChatInput"] img, [data-testid="stChatInput"] > div > div > img, [data-testid="stChatMessage"] img[src*="avatar"], [data-testid="stAvatar"],
+    img[alt*="avatar"], .css-h1sjnp img, div[class*="css-"][alt*="avatar"] {display: none !important; visibility: hidden !important; width: 0 !important; height: 0 !important; opacity: 0 !important;}
 
-    /* LAYOUT RESPONSIVO CENTRADO (sin desalineaciones - media queries para móvil) */
-    .main .block-container {max-width: 800px !important; margin: 0 auto !important; padding: 1rem !important; width: 80% !important;}
+    /* LAYOUT CENTRADO RESPONSIVO (SIN DESALINEACIONES - MEDIA QUERIES 2025) */
+    .main .block-container {max-width: 800px !important; margin: 0 auto !important; padding: 1rem !important; width: auto !important;}
     @media (max-width: 768px) {
         .main .block-container {width: 95% !important; padding: 0.5rem !important;}
-        [data-testid="stChatInput"] {max-width: 100% !important; padding-bottom: 2rem !important; margin: 0 auto !important;}
-        [data-testid="stChatMessage"] {padding: 0.5rem !important;}
+        [data-testid="stChatInput"] {max-width: 100% !important; margin: 0 auto !important;}
+        [data-testid="stChatMessage"] {padding: 0.5rem 0 !important;}
     }
     .stApp {background-color: #0e1117 !important;}
 
-    /* ESTILOS MENSAJES PERSONALIZADOS (naranja Nutrisco - sin overrides que rompan layout) */
-    [data-testid="stChatMessage"] {padding: 0 !important; gap: 0 !important; margin: 0 auto !important;}
-    .user-message {background: #262730 !important; color: white !important; border-radius: 18px !important; padding: 14px 20px !important; margin: 16px auto 16px 0 !important; max-width: 80% !important; box-shadow: 0 2px 10px rgba(0,0,0,0.4) !important; text-align: left !important;}
-    .assistant-message {background: linear-gradient(135deg, #ea580c, #f97316) !important; color: white !important; border-radius: 18px !important; padding: 14px 20px !important; margin: 16px 0 16px auto !important; max-width: 80% !important; box-shadow: 0 4px 15px rgba(249,115,22,0.5) !important; text-align: left !important;}
-    @media (max-width: 768px) {.user-message, .assistant-message {max-width: 95% !important; padding: 12px 16px !important; font-size: 1.1rem !important; margin: 12px auto !important;}}
-    .header-box {background: linear-gradient(90deg, #ea580c, #c2410c) !important; padding: 2rem !important; border-radius: 20px !important; text-align: center !important; color: white !important; box-shadow: 0 10px 30px rgba(234,88,12,0.4) !important; margin: 0 auto !important; width: 100% !important;}
+    /* ESTILOS MENSAJES (NARANJA NUTRISCO, ALINEADOS SIN HUECOS) */
+    [data-testid="stChatMessage"] {padding: 0 !important; gap: 0 !important;}
+    .user-message {background: #262730 !important; color: white !important; border-radius: 18px !important; padding: 14px 20px !important; margin: 16px 0 !important; max-width: 80% !important; margin-left: auto !important; box-shadow: 0 2px 10px rgba(0,0,0,0.4) !important;}
+    .assistant-message {background: linear-gradient(135deg, #ea580c, #f97316) !important; color: white !important; border-radius: 18px !important; padding: 14px 20px !important; margin: 16px 0 !important; max-width: 80% !important; margin-right: auto !important; box-shadow: 0 4px 15px rgba(249,115,22,0.5) !important;}
+    @media (max-width: 768px) {.user-message, .assistant-message {max-width: 95% !important; padding: 12px 16px !important; margin: 12px 0 !important;}}
+    .header-box {background: linear-gradient(90deg, #ea580c, #c2410c) !important; padding: 2rem !important; border-radius: 20px !important; text-align: center !important; color: white !important; box-shadow: 0 10px 30px rgba(234,88,12,0.4) !important; margin: 0 auto !important;}
     @media (max-width: 768px) {.header-box {padding: 1.5rem !important;}}
-    .belén-box {background: #dc2626 !important; color: white !important; padding: 1.3rem !important; border-radius: 15px !important; text-align: center !important; font-weight: bold !important; margin: 2rem auto !important; font-size: 1.15rem !important; box-shadow: 0 4px 15px rgba(220,38,38,0.4) !important; width: 100% !important;}
+    .belén-box {background: #dc2626 !important; color: white !important; padding: 1.3rem !important; border-radius: 15px !important; text-align: center !important; font-weight: bold !important; margin: 2rem auto !important; font-size: 1.15rem !important; box-shadow: 0 4px 15px rgba(220,38,38,0.4) !important;}
     @media (max-width: 768px) {.belén-box {font-size: 1rem !important; padding: 1rem !important;}}
-    .footer {text-align: center !important; margin-top: 4rem !important; color: #64748b !important; font-size: 0.95rem !important; padding: 2rem 0 !important; position: relative !important; z-index: 10 !important; width: 100% !important;}
-    .typing {font-style: italic !important; color: #94a3b8 !important; margin: 15px auto !important; text-align: left !important;}
+    .footer {text-align: center !important; margin-top: 4rem !important; color: #64748b !important; font-size: 0.95rem !important; padding: 2rem 0 !important; position: relative !important; z-index: 10 !important;}
+    .typing {font-style: italic !important; color: #94a3b8 !important; margin: 15px 0 !important; text-align: left !important;}
     @keyframes blink {0%, 100% {opacity: 1;} 50% {opacity: 0;}}
 </style>
 
-<!-- JS DINÁMICO: BORRA RESIDUALES EN MÓVIL (cada 500ms - fix para inyección dinámica 2025) -->
+<!-- JS DINÁMICO: BORRA RESIDUALES CADA 500MS (FIX PARA MÓVIL 2025) -->
 <script>
     setInterval(() => {
-        const elements = document.querySelectorAll('footer, [data-testid="stStatusWidget"], [data-testid="stDeployButton"], [data-testid="stChatInput"] img, img[alt*="avatar"], div:contains("Streamlit"), div:contains("Hosted")');
-        elements.forEach(el => { if (el) { el.style.display = 'none'; el.style.visibility = 'hidden'; el.style.opacity = '0'; } });
+        const elements = document.querySelectorAll('footer, [data-testid="stStatusWidget"], button[data-testid="stDeployButton"], [data-testid="stChatInput"] img, img[alt*="avatar"], div:contains("Streamlit"), div:contains("Hosted")');
+        elements.forEach(el => { if (el) { el.style.display = 'none'; el.style.visibility = 'hidden'; el.style.opacity = '0'; el.remove(); } });  // remove() para limpiar DOM
     }, 500);
 </script>
 """, unsafe_allow_html=True)
@@ -86,7 +87,7 @@ if "messages" not in st.session_state:
 
 # ==================== MOSTRAR HISTORIAL ====================
 for msg in st.session_state.messages:
-    with st.chat_message(msg["role"], avatar=None):  # Elimina avatares en mensajes
+    with st.chat_message(msg["role"], avatar=None):
         st.markdown(f'<div class="{ "user-message" if msg["role"] == "user" else "assistant-message" }">{msg["content"]}</div>', unsafe_allow_html=True)
 
 # ==================== INPUT Y PROCESAMIENTO ====================
