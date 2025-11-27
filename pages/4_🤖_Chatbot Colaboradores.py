@@ -8,29 +8,41 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# QUITAR 100% TODO EL BRANDING DE STREAMLIT (avatar, corona, toolbar, deploy…)
+# ==================== ELIMINAR 100% AVATARES, IMAGEN Y CORONA ====================
 st.markdown("""
 <style>
-    /* Oculta TODA la barra de herramientas y el avatar del usuario */
-    section[data-testid="stSidebar"] ~ div > div > div > div > div > section > div > div > div > div > div > div > div > div > div > div > div > div > div > div > div > div > div > div > div > div > div > div > div[data-testid="stToolbar"] {display: none !important;}
-    div[data-testid="collapsedControl"] {display: none !important;}
-    button[title="Deploy"] {display: none !important;}
-    button[title="View source code"] {display: none !important;}
-    header {display: none !important;}
-    footer {display: none !important;}
-    .stDeployButton {display: none !important;}
-    /* Oculta específicamente el avatar y corona en el chat */
-    .stChatMessage img {display: none !important;}
-    .stChatMessage [data-testid="avatar"] {display: none !important;}
-    .stChatMessage [kind="avatar"] {display: none !important;}
-    .stApp > header {display: none !important;}
+    /* ELIMINAR COMPLETAMENTE AVATARES (IMAGEN Y CORONA) */
+    div[data-testid="stChatMessageAvatar"],
+    div[data-testid="stChatMessage"] > div > div > div > div > div > img,
+    div[data-testid="stChatMessage"] > div > div > div > div > div > svg,
+    .stChatMessage [data-testid="stAvatar"],
+    .stChatMessage img,
+    .stChatMessage svg {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        visibility: hidden !important;
+    }
+    
+    /* ELIMINAR EL ESPACIO DE AVATARES */
+    div[data-testid="stChatMessage"] > div > div > div {
+        gap: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+    
+    /* ELIMINAR CORONAS Y BADGES ESPECÍFICAMENTE */
+    div[class*="crown"],
+    div[class*="Crown"],
+    svg[class*="crown"] {
+        display: none !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
-# ==================== ELIMINAR TODO EL BRANDING DE STREAMLIT (avatar, corona, deploy, toolbar) ====================
+# ==================== ELIMINAR TODO EL BRANDING DE STREAMLIT ====================
 st.markdown("""
 <style>
-    /* OCULTAR COMPLETAMENTE TODO LO DE STREAMLIT */
     div[data-testid="stToolbar"] {display: none !important;}
     div[data-testid="collapsedControl"] {display: none !important;}
     button[title="Deploy"] {display: none !important;}
@@ -43,6 +55,8 @@ st.markdown("""
     .main > div {padding-top: 0rem !important;}
 </style>
 """, unsafe_allow_html=True)
+
+# ... (el resto de tu código se mantiene igual)
 
 API_KEY = os.getenv("OPENAI_API_KEY")
 if not API_KEY:
