@@ -1,4 +1,4 @@
-# pages/4_🤖_Chatbot Colaboradores.py → VERSIÓN FINAL 2025: SIN CORONA/FOTO/HOSTED, NAVEGACIÓN INTACTA (FIXES v1.38+)
+# pages/4_🤖_Chatbot Colaboradores.py → VERSIÓN FINAL 2025: SIN CORONA/FOTO/CUADRADO/HOSTED, CENTRADO MÓVIL (FIXES FOROS NOV 2025)
 import streamlit as st
 import pandas as pd
 import requests
@@ -6,7 +6,6 @@ import os
 import time
 from datetime import datetime
 from dotenv import load_dotenv
-from streamlit.components.v1 import html
 load_dotenv()
 
 # ==================== CONFIGURACIÓN GLOBAL ====================
@@ -17,21 +16,18 @@ st.set_page_config(
     initial_sidebar_state="collapsed"  # Hamburguesa visible para volver atrás
 )
 
-# ==================== CSS DEFINITIVO 2025 (OCULTA CORONA CON .stAppDeployButton) ====================
+# ==================== CSS + JS DEFINITIVO 2025 (DE DISCUSS.STREAMLIT.IO – BORRA HOSTED Y CORONA) ====================
 st.markdown("""
 <style>
-    /* OCULTAR CORONA ROJA (DEPLOY BUTTON v1.38+) Y HOSTED FOOTER */
-    .stAppDeployButton {visibility: hidden !important; display: none !important;}
-    button[data-testid="stDeployButton"], .stDeployButton {display: none !important;}
+    /* OCULTAR CORONA ROJA (DEPLOY BUTTON) Y HOSTED FOOTER (FIX NOV 2025) */
+    button[data-testid="stDeployButton"], .stDeployButton, .stAppDeployButton {display: none !important; visibility: hidden !important; height: 0 !important; z-index: -1 !important; opacity: 0 !important;}
     footer, [data-testid="stStatusWidget"], div[class*="hosted"], div:contains("Streamlit") {display: none !important; visibility: hidden !important; height: 0 !important;}
 
-    /* OCULTAR FOTO/AVATAR EN INPUT (FIX #12132 MÓVIL) */
-    [data-testid="stChatInput"] img, [data-testid="stChatInput"] > div > div > img, [data-testid="stChatInput"] svg, [data-testid="stChatInput"] [alt*="avatar"] {display: none !important; visibility: hidden !important; width: 0 !important; height: 0 !important; opacity: 0 !important;}
-
-    /* OCULTAR AVATARES EN MENSAJES */
+    /* OCULTAR FOTO/AVATAR/CUADRADO EN INPUT Y MENSAJES (FIX #12132 MÓVIL) */
+    [data-testid="stChatInput"] img, [data-testid="stChatInput"] svg, [data-testid="stChatInput"] [alt*="avatar"], [data-testid="stChatInput"] [kind="avatar"] {display: none !important; visibility: hidden !important; width: 0 !important; height: 0 !important; opacity: 0 !important;}
     [data-testid="stChatMessage"] img, [data-testid="stChatMessage"] svg, [data-testid="stAvatar"] {display: none !important; visibility: hidden !important; width: 0 !important; height: 0 !important;}
 
-    /* LAYOUT RESPONSIVO CENTRADO (SIN DESCUADRADO) */
+    /* LAYOUT RESPONSIVO CENTRADO (SIN DESCUADRADO – MEDIA QUERIES NOV 2025) */
     .main .block-container {max-width: 800px !important; margin: 0 auto !important; padding: 1rem !important; width: auto !important;}
     @media (max-width: 768px) {
         .main .block-container {width: 95% !important; padding: 0.5rem !important;}
@@ -39,7 +35,7 @@ st.markdown("""
     }
     .stApp {background-color: #0e1117 !important;}
 
-    /* ESTILOS MENSAJES (ALINEADOS) */
+    /* ESTILOS MENSAJES (ALINEADOS SIN HUECOS) */
     [data-testid="stChatMessage"] {padding: 0 !important; gap: 0 !important;}
     .user-message {background: #262730 !important; color: white !important; border-radius: 18px !important; padding: 14px 20px !important; margin: 16px 0 !important; max-width: 80% !important; margin-left: auto !important; box-shadow: 0 2px 10px rgba(0,0,0,0.4) !important;}
     .assistant-message {background: linear-gradient(135deg, #ea580c, #f97316) !important; color: white !important; border-radius: 18px !important; padding: 14px 20px !important; margin: 16px 0 !important; max-width: 80% !important; margin-right: auto !important; box-shadow: 0 4px 15px rgba(249,115,22,0.5) !important;}
@@ -53,7 +49,7 @@ st.markdown("""
     @keyframes blink {0%, 100% {opacity: 1;} 50% {opacity: 0;}}
 </style>
 
-<!-- JS DINÁMICO PARA BORRAR HOSTED WITH STREAMLIT (DE FOROS 2025) -->
+<!-- JS DINÁMICO: BORRA HOSTED WITH STREAMLIT Y CORONA (DE DISCUSS.STREAMLIT.IO NOV 2025) -->
 <script>
 window.top.document.querySelectorAll(`[href*="streamlit.io"]`).forEach(e => e.setAttribute("style", "display: none;"));
 setInterval(() => {
