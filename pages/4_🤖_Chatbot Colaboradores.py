@@ -1,4 +1,4 @@
-# pages/4_🤖_Chatbot Colaboradores.py → VERSIÓN FINAL 2025: SIN AVATAR/CORONA/HOSTED, CENTRADO RESPONSIVO MÓVIL (FIXES DE RELEASE NOTES)
+# pages/4_🤖_Chatbot Colaboradores.py → VERSIÓN FINAL 2025: SIN AVATAR EN INPUT/CORONA, CENTRADO RESPONSIVO (FIXES #11896/#12132)
 import streamlit as st
 import pandas as pd
 import requests
@@ -12,35 +12,35 @@ load_dotenv()
 st.set_page_config(
     page_title="Chatbot Colaboradores – Nutrisco",
     page_icon="💬",
-    layout="centered",  # Centrado nativo, con CSS para responsivo
-    initial_sidebar_state="collapsed"  # Sidebar colapsada, pero ícono hamburguesa visible
+    layout="centered",
+    initial_sidebar_state="collapsed"  # Hamburguesa visible para navegación
 )
 
-# ==================== CSS + JS DEFINITIVO 2025 (DE RELEASE NOTES Y FOROS) ====================
+# ==================== CSS + JS DEFINITIVO 2025 (BORRA AVATAR INPUT Y CORONA - DE RELEASE NOTES) ====================
 st.markdown("""
 <style>
-    /* OCULTAR HEADER Y TOOLBAR (SIN TOCAR HAMBURGUESA) */
+    /* OCULTAR SOLO LO INNECESARIO (SIN TOCAR HAMBURGUESA) */
     [data-testid="stToolbar"] {display: none !important;}
     [data-testid="collapsedControl"] {display: none !important;}
 
-    /* OCULTAR FOOTER HOSTED WITH STREAMLIT Y CORONA ROJA (FIX #11896 PARA MÓVIL) */
-    footer, [data-testid="stStatusWidget"], div.block-container > footer, div[class*="hosted"], div:contains("Streamlit"),
-    button[data-testid="stDeployButton"], .stDeployButton {display: none !important; visibility: hidden !important; height: 0 !important; z-index: -1 !important; opacity: 0 !important;}
+    /* OCULTAR CORONA ROJA (DEPLOY BUTTON) Y HOSTED FOOTER (FIX #11896 MÓVIL) */
+    button[data-testid="stDeployButton"], .stDeployButton, footer, [data-testid="stStatusWidget"], div[class*="hosted"], div:contains("Streamlit") {display: none !important; visibility: hidden !important; height: 0 !important; z-index: -1 !important; opacity: 0 !important;}
 
-    /* OCULTAR AVATAR EN CHAT_INPUT Y MENSAJES (FIX #12132 PARA RESIZE MÓVIL) */
-    [data-testid="stChatInput"] img, [data-testid="stChatInput"] > div > div > img, [data-testid="stChatMessage"] img[src*="avatar"], [data-testid="stAvatar"],
-    img[alt*="avatar"], .css-h1sjnp img, div[class*="css-"][alt*="avatar"] {display: none !important; visibility: hidden !important; width: 0 !important; height: 0 !important; opacity: 0 !important;}
+    /* OCULTAR AVATAR EN CHAT_INPUT (CUADRADO CON CARA - FIX #12132 RESIZE MÓVIL) */
+    [data-testid="stChatInput"] img, [data-testid="stChatInput"] > div > div > img, [data-testid="stChatInput"] [alt*="avatar"], img[alt*="avatar"] {display: none !important; visibility: hidden !important; width: 0 !important; height: 0 !important; opacity: 0 !important; position: absolute !important;}
 
-    /* LAYOUT CENTRADO RESPONSIVO (SIN DESALINEACIONES - MEDIA QUERIES 2025) */
+    /* OCULTAR AVATARES EN MENSAJES (POR SI ACASO) */
+    [data-testid="stChatMessage"] img[src*="avatar"], [data-testid="stAvatar"] {display: none !important; visibility: hidden !important; width: 0 !important; height: 0 !important;}
+
+    /* LAYOUT CENTRADO RESPONSIVO (SIN DESCUADRADO - WIDTH AUTO) */
     .main .block-container {max-width: 800px !important; margin: 0 auto !important; padding: 1rem !important; width: auto !important;}
     @media (max-width: 768px) {
         .main .block-container {width: 95% !important; padding: 0.5rem !important;}
-        [data-testid="stChatInput"] {max-width: 100% !important; margin: 0 auto !important;}
-        [data-testid="stChatMessage"] {padding: 0.5rem 0 !important;}
+        [data-testid="stChatInput"] {max-width: 100% !important; margin: 0 auto !important; padding-bottom: 0 !important;}
     }
     .stApp {background-color: #0e1117 !important;}
 
-    /* ESTILOS MENSAJES (NARANJA NUTRISCO, ALINEADOS SIN HUECOS) */
+    /* ESTILOS MENSAJES (ALINEADOS SIN HUECOS) */
     [data-testid="stChatMessage"] {padding: 0 !important; gap: 0 !important;}
     .user-message {background: #262730 !important; color: white !important; border-radius: 18px !important; padding: 14px 20px !important; margin: 16px 0 !important; max-width: 80% !important; margin-left: auto !important; box-shadow: 0 2px 10px rgba(0,0,0,0.4) !important;}
     .assistant-message {background: linear-gradient(135deg, #ea580c, #f97316) !important; color: white !important; border-radius: 18px !important; padding: 14px 20px !important; margin: 16px 0 !important; max-width: 80% !important; margin-right: auto !important; box-shadow: 0 4px 15px rgba(249,115,22,0.5) !important;}
@@ -54,11 +54,11 @@ st.markdown("""
     @keyframes blink {0%, 100% {opacity: 1;} 50% {opacity: 0;}}
 </style>
 
-<!-- JS DINÁMICO: BORRA RESIDUALES CADA 500MS (FIX PARA MÓVIL 2025) -->
+<!-- JS DINÁMICO: BORRA AVATAR INPUT Y CORONA CADA 500MS (FIX DINÁMICO MÓVIL 2025) -->
 <script>
     setInterval(() => {
-        const elements = document.querySelectorAll('footer, [data-testid="stStatusWidget"], button[data-testid="stDeployButton"], [data-testid="stChatInput"] img, img[alt*="avatar"], div:contains("Streamlit"), div:contains("Hosted")');
-        elements.forEach(el => { if (el) { el.style.display = 'none'; el.style.visibility = 'hidden'; el.style.opacity = '0'; el.remove(); } });  // remove() para limpiar DOM
+        const elements = document.querySelectorAll('[data-testid="stChatInput"] img, button[data-testid="stDeployButton"], footer, [data-testid="stStatusWidget"], img[alt*="avatar"], div:contains("Streamlit"), div:contains("Hosted")');
+        elements.forEach(el => { if (el) { el.style.display = 'none'; el.remove(); } });
     }, 500);
 </script>
 """, unsafe_allow_html=True)
