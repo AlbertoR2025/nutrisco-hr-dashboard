@@ -8,6 +8,25 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# QUITAR 100% TODO EL BRANDING DE STREAMLIT (avatar, corona, toolbar, deploy…)
+st.markdown("""
+<style>
+    /* Oculta TODA la barra de herramientas y el avatar del usuario */
+    section[data-testid="stSidebar"] ~ div > div > div > div > div > section > div > div > div > div > div > div > div > div > div > div > div > div > div > div > div > div > div > div > div > div > div > div > div[data-testid="stToolbar"] {display: none !important;}
+    div[data-testid="collapsedControl"] {display: none !important;}
+    button[title="Deploy"] {display: none !important;}
+    button[title="View source code"] {display: none !important;}
+    header {display: none !important;}
+    footer {display: none !important;}
+    .stDeployButton {display: none !important;}
+    /* Oculta específicamente el avatar y corona en el chat */
+    .stChatMessage img {display: none !important;}
+    .stChatMessage [data-testid="avatar"] {display: none !important;}
+    .stChatMessage [kind="avatar"] {display: none !important;}
+    .stApp > header {display: none !important;}
+</style>
+""", unsafe_allow_html=True)
+
 # ==================== ELIMINAR TODO EL BRANDING DE STREAMLIT (avatar, corona, deploy, toolbar) ====================
 st.markdown("""
 <style>
