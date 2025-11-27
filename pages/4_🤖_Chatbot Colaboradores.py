@@ -1,4 +1,4 @@
-# pages/4_🤖_Chatbot Colaboradores.py → VERSIÓN FINAL 2025: SIN FOTO/CORONA, SIMÉTRICO DESKTOP/MÓVIL (FIX V1.38 DISCUSS #80477)
+# pages/4_🤖_Chatbot Colaboradores.py → VERSIÓN FINAL 2025: SIN FOTO/CORONA, SIMÉTRICO DESKTOP/MÓVIL
 import streamlit as st
 import pandas as pd
 import requests
@@ -17,7 +17,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# ==================== CSS DEFINITIVO 2025 (DE DISCUSS #80477) ====================
+# ==================== CSS DEFINITIVO 2025 (SIN ROMPER EL CHAT) ====================
 css_code = '''
 <style>
     /* OCULTAR CORONA ROJA (DEPLOY BUTTON / CROWN) */
@@ -36,7 +36,7 @@ css_code = '''
         height: 0 !important;
     }
 
-    /* OCULTAR AVATAR EN INPUT DE CHAT (SELECCIONES MÁS PROFUNDAS) */
+    /* OCULTAR AVATAR EN INPUT DE CHAT (SOLO LA IMAGEN/SVG) */
     [data-testid="stChatInput"] > div > div > div > img,
     [data-testid="stChatInput"] > div > div > div > svg,
     [data-testid="stChatInput"] > div > div > div > [alt*="avatar"],
@@ -48,7 +48,7 @@ css_code = '''
         opacity: 0 !important;
     }
 
-    /* OCULTAR AVATARES EN MENSAJES DEL CHAT (MÁS PROFUNDOS) */
+    /* OCULTAR AVATARES EN MENSAJES DEL CHAT (SOLO LA IMAGEN/SVG) */
     [data-testid="stChatMessage"] > div > img,
     [data-testid="stChatMessage"] > div > svg,
     [data-testid="stChatMessage"] > div > [data-testid="stAvatar"] {
@@ -127,19 +127,8 @@ css_code = '''
         display: none !important;
     }
 
-    /* OCULTAR LA CORONA EN EL INPUT (SI AUN APARECE) */
-    [data-testid="stChatInput"] > div > div > div > div > img,
-    [data-testid="stChatInput"] > div > div > div > div > svg {
-        display: none !important;
-    }
-
-    /* OCULTAR CONTENEDOR DE AVATAR EN INPUT */
+    /* OCULTAR SOLO EL CONTENEDOR DEL AVATAR EN INPUT (SI ES NECESARIO) */
     [data-testid="stChatInput"] > div > div > div {
-        display: none !important;
-    }
-
-    /* OCULTAR CONTENEDOR DE AVATAR EN MENSAJES */
-    [data-testid="stChatMessage"] > div {
         display: none !important;
     }
 </style>
@@ -151,12 +140,30 @@ st.write(css_code, unsafe_allow_html=True)
 # ==================== CONTENIDO DEL CHATBOT ====================
 st.markdown('<div class="header-box"><h1>Chatbot Colaboradores</h1><p>Nutrisco – Atención Personas</p><p>Escribe tu duda y te respondo al instante</p></div>', unsafe_allow_html=True)
 
-# Mensaje inicial
-st.chat_message("assistant", avatar=None).write("¡Hola! 🤝 Soy parte del equipo de **Atención a Personas** de Nutrisco.\n\nPuedes preguntarme cualquier cosa: licencias, beneficios, BUK, finiquitos, vestimenta, bono Fisherman, etc.\n\n¡Estoy aquí para ayudarte!")
+# Mensaje inicial (IMPORTANTE: NO usar st.chat_message con avatar=None si quieres mantenerlo)
+# En lugar de eso, usamos st.markdown para evitar problemas con CSS
+st.markdown("""
+<div style="padding: 16px; background: linear-gradient(135deg, #ea580c, #f97316); color: white; border-radius: 18px; margin: 16px auto 16px 8%; max-width: 75%; box-shadow: 0 4px 15px rgba(249,115,22,0.5); text-align: left;">
+    ¡Hola! 🤝 Soy parte del equipo de <strong>Atención a Personas</strong> de Nutrisco.<br><br>
+    Puedes preguntarme cualquier cosa: licencias, beneficios, BUK, finiquitos, vestimenta, bono Fisherman, etc.<br><br>
+    ¡Estoy aquí para ayudarte!
+</div>
+""", unsafe_allow_html=True)
 
 # Input de chat
 user_input = st.chat_input("Escribe tu consulta aquí...")
 
 if user_input:
-    st.chat_message("user").write(user_input)
-    st.chat_message("assistant").write("Gracias por tu pregunta. Estoy procesando la respuesta...")
+    # Mensaje del usuario
+    st.markdown(f"""
+<div style="padding: 14px 20px; background: #262730; color: white; border-radius: 18px; margin: 16px 8% 16px auto; max-width: 75%; box-shadow: 0 2px 10px rgba(0,0,0,0.4); text-align: left;">
+    {user_input}
+</div>
+""", unsafe_allow_html=True)
+
+    # Respuesta del asistente
+    st.markdown("""
+<div style="padding: 14px 20px; background: linear-gradient(135deg, #ea580c, #f97316); color: white; border-radius: 18px; margin: 16px auto 16px 8%; max-width: 75%; box-shadow: 0 4px 15px rgba(249,115,22,0.5); text-align: left;">
+    Gracias por tu pregunta. Estoy procesando la respuesta...
+</div>
+""", unsafe_allow_html=True)
