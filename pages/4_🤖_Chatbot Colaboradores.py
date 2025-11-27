@@ -1,4 +1,4 @@
-# pages/4_🤖_Chatbot Colaboradores.py → VERSIÓN FINAL 2025: SIN CORONA/FOTO/CUADRADO/HOSTED, CENTRADO MÓVIL (FIXES FOROS NOV 2025)
+# pages/4_🤖_Chatbot Colaboradores.py → VERSIÓN FINAL 2025: SIN CORONA/FOTO/CUADRADO/LOGO GITHUB, NAVEGACIÓN OK (FIX V1.38 FOROS)
 import streamlit as st
 import pandas as pd
 import requests
@@ -16,15 +16,21 @@ st.set_page_config(
     initial_sidebar_state="collapsed"  # Hamburguesa visible para volver atrás
 )
 
-# ==================== CSS + JS DEFINITIVO 2025 (DE DISCUSS.STREAMLIT.IO – BORRA HOSTED Y CORONA) ====================
+# ==================== CSS DEFINITIVO 2025 (DE DISCUSS.STREAMLIT.IO – .stAppDeployButton PARA CORONA) ====================
 st.markdown("""
 <style>
-    /* OCULTAR CORONA ROJA (DEPLOY BUTTON) Y HOSTED FOOTER (FIX NOV 2025) */
-    button[data-testid="stDeployButton"], .stDeployButton, .stAppDeployButton {display: none !important; visibility: hidden !important; height: 0 !important; z-index: -1 !important; opacity: 0 !important;}
-    footer, [data-testid="stStatusWidget"], div[class*="hosted"], div:contains("Streamlit") {display: none !important; visibility: hidden !important; height: 0 !important;}
+    /* OCULTAR CORONA ROJA (DEPLOY BUTTON V1.38+) */
+    .stAppDeployButton {visibility: hidden !important; display: none !important;}
+    button[data-testid="stDeployButton"], .stDeployButton {display: none !important; visibility: hidden !important; height: 0 !important; z-index: -1 !important;}
 
-    /* OCULTAR FOTO/AVATAR/CUADRADO EN INPUT Y MENSAJES (FIX #12132 MÓVIL) */
-    [data-testid="stChatInput"] img, [data-testid="stChatInput"] svg, [data-testid="stChatInput"] [alt*="avatar"], [data-testid="stChatInput"] [kind="avatar"] {display: none !important; visibility: hidden !important; width: 0 !important; height: 0 !important; opacity: 0 !important;}
+    /* OCULTAR HOSTED FOOTER Y LOGO GITHUB (FORK BUTTON) */
+    footer, [data-testid="stStatusWidget"], div[class*="hosted"], div:contains("Streamlit") {display: none !important; visibility: hidden !important; height: 0 !important;}
+    a[href*="github.com"] {display: none !important;}  /* Oculta logo GitHub/fork */
+
+    /* OCULTAR FOTO/AVATAR/CUADRADO EN INPUT (FIX #12132 MÓVIL) */
+    [data-testid="stChatInput"] img, [data-testid="stChatInput"] svg, [data-testid="stChatInput"] [kind="avatar"], [data-testid="stChatInput"] [alt*="avatar"] {display: none !important; visibility: hidden !important; width: 0 !important; height: 0 !important; opacity: 0 !important;}
+
+    /* OCULTAR AVATARES EN MENSAJES */
     [data-testid="stChatMessage"] img, [data-testid="stChatMessage"] svg, [data-testid="stAvatar"] {display: none !important; visibility: hidden !important; width: 0 !important; height: 0 !important;}
 
     /* LAYOUT RESPONSIVO CENTRADO (SIN DESCUADRADO – MEDIA QUERIES NOV 2025) */
@@ -49,11 +55,11 @@ st.markdown("""
     @keyframes blink {0%, 100% {opacity: 1;} 50% {opacity: 0;}}
 </style>
 
-<!-- JS DINÁMICO: BORRA HOSTED WITH STREAMLIT Y CORONA (DE DISCUSS.STREAMLIT.IO NOV 2025) -->
+<!-- JS DINÁMICO: BORRA LOGO GITHUB, HOSTED, CORONA (DE FOROS NOV 2025) -->
 <script>
-window.top.document.querySelectorAll(`[href*="streamlit.io"]`).forEach(e => e.setAttribute("style", "display: none;"));
+window.top.document.querySelectorAll(`a[href*="github.com"], a[href*="streamlit.io"]`).forEach(e => e.setAttribute("style", "display: none;"));
 setInterval(() => {
-    const elements = document.querySelectorAll('button[data-testid="stDeployButton"], .stDeployButton, .stAppDeployButton, [data-testid="stChatInput"] img, [data-testid="stChatInput"] svg, [data-testid="stAvatar"], footer, [data-testid="stStatusWidget"], img[alt*="avatar"], div:contains("Streamlit"), div:contains("Hosted")');
+    const elements = document.querySelectorAll('button[data-testid="stDeployButton"], .stDeployButton, .stAppDeployButton, [data-testid="stChatInput"] img, [data-testid="stChatInput"] svg, [data-testid="stChatInput"] [kind="avatar"], [data-testid="stAvatar"], footer, [data-testid="stStatusWidget"], img[alt*="avatar"], div:contains("Streamlit"), div:contains("Hosted")');
     elements.forEach(el => { if (el) { el.style.display = 'none'; el.remove(); } });
 }, 500);
 </script>
