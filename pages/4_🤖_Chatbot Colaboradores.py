@@ -17,8 +17,8 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# ==================== INYECTAR CSS Y JS DIRECTAMENTE EN EL DOM ====================
-css_js_code = '''
+# ==================== CSS PARA OCULTAR CORONA, AVATAR Y FOOTER ====================
+css_code = '''
 <style>
     /* OCULTAR CORONA ROJA */
     .stAppDeployButton, button[data-testid="stDeployButton"], .stDeployButton {
@@ -36,27 +36,10 @@ css_js_code = '''
         height: 0 !important;
     }
 
-    /* OCULTAR AVATAR EN INPUT DE CHAT */
-    [data-testid="stChatInput"] > div > div > div > img,
-    [data-testid="stChatInput"] > div > div > div > svg,
-    [data-testid="stChatInput"] > div > div > div > [alt*="avatar"],
-    [data-testid="stChatInput"] > div > div > div > [data-testid="stAvatar"] {
-        display: none !important;
-        visibility: hidden !important;
-        width: 0 !important;
-        height: 0 !important;
-        opacity: 0 !important;
-    }
-
-    /* OCULTAR AVATARES EN MENSAJES DEL CHAT */
-    [data-testid="stChatMessage"] > div > img,
-    [data-testid="stChatMessage"] > div > svg,
-    [data-testid="stChatMessage"] > div > [data-testid="stAvatar"] {
-        display: none !important;
-        visibility: hidden !important;
-        width: 0 !important;
-        height: 0 !important;
-    }
+    /* OCULTAR MENÚ SUPERIOR (Fork, Deploy) */
+    .stToolbar { display: none !important; }
+    .stHeader { display: none !important; }
+    .stDeployButtonContainer { display: none !important; }
 
     /* LAYOUT SIMÉTRICO RESPONSIVO */
     .main .block-container {
@@ -121,68 +104,17 @@ css_js_code = '''
         border-radius: 15px !important;
         text-align: center !important;
     }
-
-    /* EXTRA: OCULTAR BOTÓN DE "FORK" O "GITHUB" SI APARECE */
-    [data-testid="stGitHubButton"], button[aria-label="Fork this app"], [data-testid="stToolbar"] {
-        display: none !important;
-    }
-
-    /* OCULTAR CONTENEDOR DEL AVATAR EN INPUT */
-    [data-testid="stChatInput"] > div > div > div {
-        display: none !important;
-    }
-
-    /* OCULTAR CONTENEDOR DEL AVATAR EN MENSAJES */
-    [data-testid="stChatMessage"] > div {
-        display: none !important;
-    }
-
-    /* OCULTAR MENÚ SUPERIOR (Fork, Deploy) */
-    .stToolbar { display: none !important; }
-    .stHeader { display: none !important; }
-    .stDeployButtonContainer { display: none !important; }
 </style>
-
-<script>
-// Inyecta el CSS en el DOM
-document.head.innerHTML += '<style>' + document.querySelector('style').textContent + '</style>';
-
-// Espera a que todo esté cargado
-window.addEventListener('load', function() {
-    // Oculta la corona roja
-    const crown = document.querySelector('.stAppDeployButton') || 
-                  document.querySelector('[data-testid="stDeployButton"]') || 
-                  document.querySelector('.stDeployButton');
-    if (crown) crown.style.display = 'none';
-
-    // Oculta avatar en input
-    const avatarInInput = document.querySelector('[data-testid="stChatInput"] > div > div > div > img') ||
-                          document.querySelector('[data-testid="stChatInput"] > div > div > div > svg') ||
-                          document.querySelector('[data-testid="stChatInput"] > div > div > div > [alt*="avatar"]');
-    if (avatarInInput) avatarInInput.style.display = 'none';
-
-    // Oculta avatares en mensajes
-    const messageAvatars = document.querySelectorAll('[data-testid="stChatMessage"] > div > img, [data-testid="stChatMessage"] > div > svg, [data-testid="stChatMessage"] > div > [data-testid="stAvatar"]');
-    messageAvatars.forEach(el => el.style.display = 'none');
-
-    // Oculta footer y GitHub
-    const footerElements = document.querySelectorAll('footer, [data-testid="stStatusWidget"], div[class*="hosted"], a[href*="github.com"]');
-    footerElements.forEach(el => el.style.display = 'none');
-
-    // Oculta menú superior (Fork, Deploy)
-    const toolbar = document.querySelector('.stToolbar');
-    if (toolbar) toolbar.style.display = 'none';
-});
-</script>
 '''
 
-# Aplica el CSS y JS usando st.write
-st.write(css_js_code, unsafe_allow_html=True)
+# Aplica el CSS
+st.write(css_code, unsafe_allow_html=True)
 
 # ==================== CONTENIDO DEL CHATBOT ====================
+# Mensaje inicial
 st.markdown('<div class="header-box"><h1>Chatbot Colaboradores</h1><p>Nutrisco – Atención Personas</p><p>Escribe tu duda y te respondo al instante</p></div>', unsafe_allow_html=True)
 
-# Mensaje inicial
+# Mensaje de bienvenida
 st.markdown("""
 <div style="padding: 16px; background: linear-gradient(135deg, #ea580c, #f97316); color: white; border-radius: 18px; margin: 16px auto 16px 8%; max-width: 75%; box-shadow: 0 4px 15px rgba(249,115,22,0.5); text-align: left;">
     ¡Hola! 🤝 Soy parte del equipo de <strong>Atención a Personas</strong> de Nutrisco.<br><br>
@@ -191,16 +123,18 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Input de chat
-user_input = st.chat_input("Escribe tu consulta aquí...")
+# Input personalizado (sin avatar)
+user_input = st.text_input("Escribe tu consulta aquí...", placeholder="Escribe tu consulta aquí...", key="chat_input")
 
 if user_input:
+    # Mensaje del usuario
     st.markdown(f"""
 <div style="padding: 14px 20px; background: #262730; color: white; border-radius: 18px; margin: 16px 8% 16px auto; max-width: 75%; box-shadow: 0 2px 10px rgba(0,0,0,0.4); text-align: left;">
     {user_input}
 </div>
 """, unsafe_allow_html=True)
 
+    # Respuesta del asistente
     st.markdown("""
 <div style="padding: 14px 20px; background: linear-gradient(135deg, #ea580c, #f97316); color: white; border-radius: 18px; margin: 16px auto 16px 8%; max-width: 75%; box-shadow: 0 4px 15px rgba(249,115,22,0.5); text-align: left;">
     Gracias por tu pregunta. Estoy procesando la respuesta...
