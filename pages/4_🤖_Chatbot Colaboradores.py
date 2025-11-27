@@ -8,10 +8,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# === QUITAR AVATAR, CORONA Y BARRA DE STREAMLIT EN CUENTAS GRATIS (FUNCIONA 100%) ===
-st.query_params["embed"] = "true"
-st.query_params["embed_options"] = "hide_toolbar,hide_sidebar_nav"
-
 # ==================== ELIMINAR TODO EL BRANDING DE STREAMLIT (avatar, corona, deploy, toolbar) ====================
 st.markdown("""
 <style>
