@@ -1,4 +1,4 @@
-# pages/4_🤖_Chatbot Colaboradores.py → VERSIÓN FINAL 2025: SIN CORONA/IMAGEN AVATAR, CENTRADO RESPONSIVO MÓVIL (FIXES #11896/#12132)
+# pages/4_🤖_Chatbot Colaboradores.py → VERSIÓN FINAL 2025: SIN CORONA/IMAGEN/AVATAR, CENTRADO MÓVIL PERFECTO (FIX #11896/#12132)
 import streamlit as st
 import pandas as pd
 import requests
@@ -16,24 +16,24 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# ==================== CSS + JS DEFINITIVO 2025 (DE RELEASE NOTES - OCULTA CORONA E IMAGEN) ====================
+# ==================== CSS + JS DEFINITIVO 2025 (OCULTA CORONA/IMAGEN/AVATAR - DE RELEASE NOTES) ====================
 st.markdown("""
 <style>
     /* OCULTAR CORONA ROJA (DEPLOY BUTTON) Y HOSTED FOOTER (FIX #11896 MÓVIL) */
     button[data-testid="stDeployButton"], .stDeployButton {display: none !important; visibility: hidden !important; height: 0 !important; z-index: -1 !important; opacity: 0 !important;}
     footer, [data-testid="stStatusWidget"], div[class*="hosted"], div:contains("Streamlit") {display: none !important; visibility: hidden !important; height: 0 !important;}
 
-    /* OCULTAR IMAGEN/AVATAR EN CHAT_INPUT (RESIDUAL EN MÓVIL - FIX #12132) */
+    /* OCULTAR IMAGEN/AVATAR EN CHAT_INPUT (RESIDUAL - FIX #12132 RESIZE) */
     [data-testid="stChatInput"] img, [data-testid="stChatInput"] > div > div > img, [data-testid="stChatInput"] svg, [data-testid="stChatInput"] [alt*="avatar"] {display: none !important; visibility: hidden !important; width: 0 !important; height: 0 !important; opacity: 0 !important;}
 
     /* OCULTAR AVATARES EN MENSAJES */
     [data-testid="stChatMessage"] img, [data-testid="stChatMessage"] svg, [data-testid="stAvatar"] {display: none !important; visibility: hidden !important; width: 0 !important; height: 0 !important;}
 
-    /* LAYOUT RESPONSIVO CENTRADO (SIN DESCUADRADO - MEDIA QUERIES 2025) */
+    /* LAYOUT RESPONSIVO CENTRADO (SIN DESCUADRADO - MEDIA QUERIES + PADDING INPUT MÓVIL) */
     .main .block-container {max-width: 800px !important; margin: 0 auto !important; padding: 1rem !important; width: auto !important;}
     @media (max-width: 768px) {
         .main .block-container {width: 95% !important; padding: 0.5rem !important;}
-        [data-testid="stChatInput"] {max-width: 100% !important; margin: 0 auto !important; padding-bottom: 0 !important;}
+        [data-testid="stChatInput"] {max-width: 100% !important; margin: 0 auto !important; padding-bottom: 3rem !important;}  /* Espacio para footer oculto */
     }
     .stApp {background-color: #0e1117 !important;}
 
@@ -51,10 +51,10 @@ st.markdown("""
     @keyframes blink {0%, 100% {opacity: 1;} 50% {opacity: 0;}}
 </style>
 
-<!-- JS DINÁMICO: BORRA CORONA E IMAGEN RESIDUAL CADA 500MS (FIX DINÁMICO MÓVIL 2025) -->
+<!-- JS DINÁMICO: BORRA CORONA/IMAGEN/AVATAR RESIDUAL CADA 500MS (FIX DINÁMICO MÓVIL 2025) -->
 <script>
     setInterval(() => {
-        const elements = document.querySelectorAll('button[data-testid="stDeployButton"], .stDeployButton, [data-testid="stChatInput"] img, [data-testid="stChatInput"] svg, footer, [data-testid="stStatusWidget"], img[alt*="avatar"], div:contains("Streamlit"), div:contains("Hosted")');
+        const elements = document.querySelectorAll('button[data-testid="stDeployButton"], .stDeployButton, [data-testid="stChatInput"] img, [data-testid="stChatInput"] svg, [data-testid="stAvatar"], footer, [data-testid="stStatusWidget"], img[alt*="avatar"], div:contains("Streamlit"), div:contains("Hosted")');
         elements.forEach(el => { if (el) { el.style.display = 'none'; el.style.visibility = 'hidden'; el.style.opacity = '0'; el.remove(); } });
     }, 500);
 </script>
@@ -152,7 +152,7 @@ if pregunta := st.chat_input("Escribe tu consulta aquí..."):
 
     st.rerun()
 
-# ==================== FOOTER EXACTO COMO TÚ QUIERES ====================
+# ==================== FOOTER ====================
 st.markdown("""
 <div class="footer">
     <br>
