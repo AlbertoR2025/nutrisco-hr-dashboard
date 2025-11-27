@@ -181,13 +181,11 @@ try:
     )
 
     # ==================== FOOTER ====================
-    # Footer limpio y corporativo (solo Nutrisco)
+   # ==================== FOOTER (SIEMPRE SE VE, DENTRO O FUERA DEL TRY) ====================
 st.markdown("""
 <div class="footer">
-    <p style="margin:0; font-size:0.95rem; color:#94a3b8;">
+    <p style="margin:0; font-size:0.95rem; color:#94a3b8; text-align:center; padding:1rem;">
         Inteligencia Artificial al servicio de las personas – Nutrisco
     </p>
 </div>
 """, unsafe_allow_html=True)
-except Exception as e:
-    st.error(f"Error: {e}")
