@@ -1,228 +1,166 @@
+# pages/4_🤖_Chatbot Colaboradores.py → FINAL 100% LIMPIO, SIMÉTRICO, BARRA MODERNA (FIX V1.38 NOV 2025)
 import streamlit as st
+import pandas as pd
 import requests
 import os
+import time
+from datetime import datetime
 from dotenv import load_dotenv
-
 load_dotenv()
 
+# ==================== CONFIGURACIÓN GLOBAL ====================
 st.set_page_config(
-    page_title="Chatbot Nutrisco",
+    page_title="Chatbot Colaboradores – Nutrisco",
     page_icon="💬",
     layout="centered",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="collapsed"  # Hamburguesa visible para volver atrás
 )
 
+# ==================== CSS DEFINITIVO 2025 (DE DISCUSS #80477 – .stAppDeployButton PARA CORONA) ====================
 st.markdown("""
 <style>
-/* === ELIMINAR TODOS LOS ELEMENTOS STREAMLIT NO DESEADOS === */
-header, footer, [data-testid="stToolbar"], [data-testid="stDeployButton"],
-.stDeployButton, [data-testid="stStatusWidget"], [data-testid="stDecoration"],
-button[title*="Deploy"], button[title*="View"], a[href*="github"], a[href*="streamlit"] {
-    display: none !important;
-}
+    /* OCULTAR CORONA ROJA (DEPLOY BUTTON V1.38+ - DE DISCUSS #80477) */
+    .stAppDeployButton {visibility: hidden !important; display: none !important;}
+    button[data-testid="stDeployButton"], .stDeployButton {display: none !important; visibility: hidden !important; height: 0 !important; z-index: -1 !important;}
 
-/* === ELIMINAR COMPLETAMENTE FOTOS/AVATARES DEL CHAT === */
-[data-testid="stChatMessageAvatar"],
-[data-testid="stChatMessage"] [data-testid="stAvatar"],
-[data-testid="stChatMessage"] img,
-[data-testid="stChatMessage"] svg,
-.stChatMessage img,
-.stChatMessage svg {
-    display: none !important;
-    visibility: hidden !important;
-    width: 0px !important;
-    height: 0px !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-}
+    /* OCULTAR HOSTED FOOTER Y LOGO GITHUB (DE FOROS NOV 2025) */
+    footer, [data-testid="stStatusWidget"], div[class*="hosted"], div:contains("Streamlit") {display: none !important; visibility: hidden !important; height: 0 !important;}
+    a[href*="github.com"] {display: none !important;}  /* Oculta logo GitHub/fork */
 
-/* === ELIMINAR EL CONTENEDOR DE AVATARES === */
-[data-testid="stChatMessage"] > div > div:first-child {
-    display: none !important;
-    width: 0px !important;
-    min-width: 0px !important;
-}
+    /* OCULTAR FOTO/AVATAR/CUADRADO EN INPUT (FIX #12132 MÓVIL - CONTENEDOR PRIMERO) */
+    [data-testid="stChatInput"] > div:first-child {display: none !important;}  /* Oculta el contenedor del avatar */
+    [data-testid="stChatInput"] img, [data-testid="stChatInput"] svg, [data-testid="stChatInput"] [alt*="avatar"] {display: none !important; visibility: hidden !important; width: 0 !important; height: 0 !important; opacity: 0 !important;}
 
-/* === ELIMINAR EL ESPACIO DE AVATARES === */
-[data-testid="stChatMessage"] > div {
-    gap: 0px !important;
-    margin-left: 0px !important;
-    margin-right: 0px !important;
-    padding-left: 0px !important;
-}
+    /* OCULTAR AVATARES EN MENSAJES */
+    [data-testid="stChatMessage"] img, [data-testid="stChatMessage"] svg, [data-testid="stAvatar"] {display: none !important; visibility: hidden !important; width: 0 !important; height: 0 !important;}
 
-/* === ESTILOS EXISTENTES MEJORADOS === */
-.stApp {background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);}
-.block-container {max-width: 800px !important; margin: 0 auto !important; padding: 2rem 1rem 100px 1rem !important;}
-
-.header {
-    background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
-    padding: 2.8rem 2rem;
-    border-radius: 24px;
-    text-align: center;
-    color: white;
-    margin-bottom: 2.5rem;
-    box-shadow: 0 20px 50px rgba(234, 88, 12, 0.35);
-}
-.header h1 {font-size: 2.2rem; font-weight: 700; margin: 0;}
-.header h2 {font-size: 1.25rem; font-weight: 400; margin: 0.8rem 0 0 0; opacity: 0.95;}
-.header p {margin: 0.8rem 0 0 0; opacity: 0.9; font-size: 1rem;}
-
-.user {
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
-    color: white;
-    border-radius: 18px 18px 4px 18px;
-    padding: 12px 18px;
-    margin: 10px 0 10px auto;
-    max-width: 70%;
-    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
-    font-size: 0.95rem;
-    line-height: 1.5;
-}
-
-.bot {
-    background: linear-gradient(135deg, #ea580c, #f97316);
-    color: white;
-    border-radius: 18px 18px 18px 4px;
-    padding: 12px 18px;
-    margin: 10px auto 10px 0;
-    max-width: 70%;
-    box-shadow: 0 2px 8px rgba(234, 88, 12, 0.3);
-    font-size: 0.95rem;
-    line-height: 1.5;
-}
-
-.footer {text-align: center; margin-top: 3rem; color: #94a3b8; font-size: 0.85rem; opacity: 0.7;}
-
-/* === MEJORAS PARA EL INPUT EN MÓVIL === */
-[data-testid="stChatInput"] {
-    position: fixed !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    background: rgba(15, 23, 42, 0.95) !important;
-    backdrop-filter: blur(10px) !important;
-    padding: 16px 12px 20px 12px !important;
-    border-top: 1px solid rgba(71, 85, 105, 0.4) !important;
-    z-index: 10000 !important;
-}
-
-[data-testid="stChatInput"] > div {
-    max-width: 800px !important;
-    margin: 0 auto !important;
-}
-
-@media (max-width: 768px) {
-    .block-container {padding: 1rem 0.8rem 120px 0.8rem !important;}
-    .header {padding: 2rem 1.5rem;}
-    .header h1 {font-size: 1.8rem;}
-    .user, .bot {max-width: 85%; padding: 11px 16px; font-size: 0.9rem;}
-    
-    [data-testid="stChatInput"] {
-        padding: 14px 10px 18px 10px !important;
+    /* LAYOUT SIMÉTRICO RESPONSIVO (SIN DESCUADRADO – MEDIA QUERIES NOV 2025) */
+    .main .block-container {max-width: 800px !important; margin: 0 auto !important; padding: 1rem !important; width: auto !important;}
+    @media (max-width: 768px) {
+        .main .block-container {width: 95% !important; padding: 0.5rem !important;}
+        [data-testid="stChatInput"] {max-width: 100% !important; margin: 0 auto !important; padding-bottom: 2rem !important;}
     }
-}
+    .stApp {background-color: #0e1117 !important;}
+
+    /* ESTILOS MENSAJES SIMÉTRICOS (MARGIN IGUAL IZQUIERDA/DERECHA) */
+    [data-testid="stChatMessage"] {padding: 0 !important; gap: 0 !important;}
+    .user-message {background: #262730 !important; color: white !important; border-radius: 18px !important; padding: 14px 20px !important; margin: 16px 8% 16px auto !important; max-width: 75% !important; box-shadow: 0 2px 10px rgba(0,0,0,0.4) !important;}
+    .assistant-message {background: linear-gradient(135deg, #ea580c, #f97316) !important; color: white !important; border-radius: 18px !important; padding: 14px 20px !important; margin: 16px auto 16px 8% !important; max-width: 75% !important; box-shadow: 0 4px 15px rgba(249,115,22,0.5) !important;}
+    @media (max-width: 768px) {.user-message, .assistant-message {max-width: 90% !important; padding: 12px 16px !important; margin: 12px 4% 12px auto !important;}}  /* Simétrico en móvil */
+    .header-box {background: linear-gradient(90deg, #ea580c, #c2410c) !important; padding: 2rem !important; border-radius: 20px !important; text-align: center !important; color: white !important; box-shadow: 0 10px 30px rgba(234,88,12,0.4) !important; margin: 0 auto !important;}
+    @media (max-width: 768px) {.header-box {padding: 1.5rem !important;}}
+    .belén-box {background: #dc2626 !important; color: white !important; padding: 1.3rem !important; border-radius: 15px !important; text-align: center !important; font-weight: bold !important; margin: 2rem auto !important; font-size: 1.15rem !important; box-shadow: 0 4px 15px rgba(220,38,38,0.4) !important;}
+    @media (max-width: 768px) {.belén-box {font-size: 1rem !important; padding: 1rem !important;}}
+    .footer {text-align: center !important; margin-top: 4rem !important; color: #64748b !important; font-size: 0.95rem !important; padding: 2rem 0 !important; position: relative !important; z-index: 10 !important;}
+    .typing {font-style: italic !important; color: #94a3b8 !important; margin: 15px 0 !important; text-align: left !important;}
+    @keyframes blink {0%, 100% {opacity: 1;} 50% {opacity: 0;}}
 </style>
 
-<!-- JAVASCRIPT PARA ELIMINACIÓN PERSISTENTE -->
+<!-- JS DINÁMICO: BORRA RESIDUALES CADA 300MS (FIX DINÁMICO MÓVIL 2025) -->
 <script>
-function eliminarElementosPersistentes() {
-    // Eliminar avatares del chat
-    const avatares = document.querySelectorAll([
-        '[data-testid="stChatMessageAvatar"]',
-        '[data-testid="stChatMessage"] [data-testid="stAvatar"]',
-        '[data-testid="stChatMessage"] img',
-        '[data-testid="stChatMessage"] svg',
-        '.stChatMessage img',
-        '.stChatMessage svg'
-    ].join(','));
-    
-    avatares.forEach(avatar => {
-        avatar.remove();
-        avatar.style.display = 'none';
-    });
-    
-    // Eliminar contenedores de avatar
-    document.querySelectorAll('[data-testid="stChatMessage"] > div > div:first-child').forEach(contenedor => {
-        contenedor.remove();
-        contenedor.style.display = 'none';
-    });
-    
-    // Eliminar elementos de Streamlit (corona, etc.)
-    const elementosStreamlit = document.querySelectorAll([
-        'header', 'footer',
-        '[data-testid="stToolbar"]',
-        '[data-testid="stDeployButton"]',
-        '[data-testid="stStatusWidget"]',
-        'button[title*="Deploy"]',
-        'button[title*="View"]'
-    ].join(','));
-    
-    elementosStreamlit.forEach(elemento => {
-        elemento.remove();
-        elemento.style.display = 'none';
-    });
-}
-
-// Ejecutar inmediatamente y de forma persistente
-document.addEventListener('DOMContentLoaded', eliminarElementosPersistentes);
-setTimeout(eliminarElementosPersistentes, 100);
-setTimeout(eliminarElementosPersistentes, 500);
-setTimeout(eliminarElementosPersistentes, 1000);
-
-// Ejecutar cada 2 segundos para elementos que puedan reaparecer
-setInterval(eliminarElementosPersistentes, 2000);
+    setInterval(() => {
+        const elements = document.querySelectorAll('button[data-testid="stDeployButton"], .stDeployButton, .stAppDeployButton, [data-testid="stChatInput"] img, [data-testid="stChatInput"] svg, [data-testid="stAvatar"], footer, [data-testid="stStatusWidget"], img[alt*="avatar"], div:contains("Streamlit"), div:contains("Hosted")');
+        elements.forEach(el => { if (el) { el.style.display = 'none'; el.remove(); } });
+    }, 300);
 </script>
 """, unsafe_allow_html=True)
 
+# ==================== CLAVE OPENAI ====================
 API_KEY = os.getenv("OPENAI_API_KEY")
 if not API_KEY:
-    st.error("⚠️ Falta configurar OPENAI_API_KEY")
+    st.error("⚠️ Falta la clave OPENAI_API_KEY en Secrets o .env")
     st.stop()
 
+# ==================== CABECERA CORPORATIVA ====================
 st.markdown("""
-<div class="header">
-    <h1>Chatbot Colaboradores</h1>
-    <h2>Nutrisco – Atención Personas</h2>
-    <p>Escribe tu duda y te respondo al instante</p>
+<div class="header-box">
+    <h1 style="margin:0; font-size: 2.4rem; font-weight: 800;">Chatbot Colaboradores</h1>
+    <h2 style="margin:10px 0 0 0; font-weight: 400; font-size: 1.4rem;">Nutrisco – Atención Personas</h2>
+    <p style="margin:15px 0 0 0; opacity: 0.9;">Escribe tu duda y te respondo al instante</p>
 </div>
 """, unsafe_allow_html=True)
 
+# ==================== INICIALIZAR CHAT ====================
 if "messages" not in st.session_state:
     st.session_state.messages = [{
         "role": "assistant",
-        "content": "¡Hola! Soy parte del equipo de **Atención a Personas** de Nutrisco.\n\nPuedes preguntarme sobre: licencias, beneficios, BUK, finiquitos, vestimenta, bono Fisherman y más.\n\n¡Estoy aquí para ayudarte!"
+        "content": "¡Hola! 👋 Soy parte del equipo de **Atención a Personas** de Nutrisco.\n\nPuedes preguntarme cualquier cosa: licencias, beneficios, BUK, finiquitos, vestimenta, bono Fisherman, etc.\n\n¡Estoy aquí para ayudarte!"
     }]
 
+# ==================== MOSTRAR HISTORIAL ====================
 for msg in st.session_state.messages:
-    if msg["role"] == "user":
-        st.markdown(f'<div class="user">{msg["content"]}</div>', unsafe_allow_html=True)
-    else:
-        st.markdown(f'<div class="bot">{msg["content"]}</div>', unsafe_allow_html=True)
+    with st.chat_message(msg["role"], avatar=None):
+        st.markdown(f'<div class="{ "user-message" if msg["role"] == "user" else "assistant-message" }">{msg["content"]}</div>', unsafe_allow_html=True)
 
-if prompt := st.chat_input("Escribe tu consulta aquí..."):
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    
+# ==================== INPUT Y PROCESAMIENTO ====================
+if pregunta := st.chat_input("Escribe tu consulta aquí..."):
+    st.session_state.messages.append({"role": "user", "content": pregunta})
+    with st.chat_message("user", avatar=None):
+        st.markdown(f'<div class="user-message">{pregunta}</div>', unsafe_allow_html=True)
+
+    with st.chat_message("assistant", avatar=None):
+        placeholder = st.empty()
+        placeholder.markdown('<div class="typing">Escribiendo<span style="animation: blink 1s infinite;">...</span></div>', unsafe_allow_html=True)
+        time.sleep(1.3)
+        placeholder.empty()
+
+        try:
+            response = requests.post(
+                "https://api.openai.com/v1/chat/completions",
+                headers={"Authorization": f"Bearer {API_KEY}"},
+                json={
+                    "model": "gpt-4o-mini",
+                    "temperature": 0.7,
+                    "max_tokens": 600,
+                    "messages": [
+                        {"role": "system", "content": "Eres una persona real del equipo de RR.HH. de Nutrisco en Chile. Hablas español chileno, cercano, profesional y amable. Nunca digas que eres IA. Si el tema es delicado (acoso, conflicto, denuncia), deriva con mucho tacto a Belén Bastías."},
+                        {"role": "user", "content": pregunta}
+                    ]
+                },
+                timeout=30
+            )
+            respuesta = response.json()["choices"][0]["message"]["content"]
+        except Exception as e:
+            respuesta = "Uy, justo ahora tengo un problema de conexión. Mejor escribe a **belen.bastias@nutrisco.com** o llama al interno **7219**. ¡Perdona las molestias!"
+
+        st.markdown(f'<div class="assistant-message">{respuesta}</div>', unsafe_allow_html=True)
+    st.session_state.messages.append({"role": "assistant", "content": respuesta})
+
+    # Temas sensibles
+    sensibles = ["agresi", "acoso", "denuncia", "conflicto", "pelea", "maltrato", "insulto", "abus", "discrimin"]
+    if any(p in pregunta.lower() for p in sensibles):
+        st.markdown("""
+        <div class="belén-box">
+            Este tema es muy importante<br>
+            <strong>Belén Bastías Hurtado</strong> te puede ayudar personalmente<br>
+            📧 belen.bastias@nutrisco.com | ☎ Interno: 7219
+        </div>
+        """, unsafe_allow_html=True)
+
+    # Guardar historial
     try:
-        resp = requests.post(
-            "https://api.openai.com/v1/chat/completions",
-            headers={"Authorization": f"Bearer {API_KEY}"},
-            json={
-                "model": "gpt-4o-mini",
-                "temperature": 0.7,
-                "max_tokens": 600,
-                "messages": [
-                    {"role": "system", "content": "Eres del equipo RRHH de Nutrisco Chile. Hablas español chileno, cercano y profesional. Para temas sensibles deriva a Belén Bastías."},
-                    {"role": "user", "content": prompt},
-                ],
-            },
-            timeout=30,
-        )
-        answer = resp.json()["choices"][0]["message"]["content"]
-    except Exception:
-        answer = "⚠️ Problema de conexión. Contacta a Belén Bastías: belen.bastias@nutrisco.com"
-    
-    st.session_state.messages.append({"role": "assistant", "content": answer})
+        nuevo = pd.DataFrame([{
+            "Fecha": datetime.now().strftime("%d/%m/%Y %H:%M"),
+            "Pregunta": pregunta,
+            "Respuesta": respuesta
+        }])
+        archivo = "data/historial_chatbot.xlsx"
+        os.makedirs("data", exist_ok=True)
+        if os.path.exists(archivo):
+            df_antiguo = pd.read_excel(archivo)
+            df_final = pd.concat([df_antiguo, nuevo], ignore_index=True)
+        else:
+            df_final = nuevo
+        df_final.to_excel(archivo, index=False)
+    except:
+        pass
+
     st.rerun()
 
-st.markdown('<div class="footer">Inteligencia Artificial al servicio de las personas – Nutrisco © 2025</div>', unsafe_allow_html=True)
+# ==================== FOOTER ====================
+st.markdown("""
+<div class="footer">
+    <br>
+    Inteligencia Artificial al servicio de las personas – Nutrisco © 2025
+</div>
+""", unsafe_allow_html=True)
