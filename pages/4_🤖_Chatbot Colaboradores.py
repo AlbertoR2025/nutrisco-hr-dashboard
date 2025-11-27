@@ -49,37 +49,4 @@ st.markdown("""
     @media (max-width: 768px) {.user-message, .assistant-message {max-width: 90% !important; padding: 12px 16px !important; margin: 12px 4% 12px auto !important;}}  /* Simétrico en móvil */
     .header-box {background: linear-gradient(90deg, #ea580c, #c2410c) !important; padding: 2rem !important; border-radius: 20px !important; text-align: center !important; color: white !important; box-shadow: 0 10px 30px rgba(234,88,12,0.4) !important; margin: 0 auto !important;}
     @media (max-width: 768px) {.header-box {padding: 1.5rem !important;}}
-    .belén-box {background: #dc2626 !important; color: white !important; padding: 1.3rem !important; border-radius: 15px !important; text-align: center !important; font-weight: bold !important; margin: 2rem auto !important; font-size: 1.15rem !important; box-shadow: 0 4px 15px rgba(220,38,38,0.4) !important;}
-    @media (max-width: 768px) {.belén-box {font-size: 1rem !important; padding: 1rem !important;}}
-    .footer {text-align: center !important; margin-top: 4rem !important; color: #64748b !important; font-size: 0.95rem !important; padding: 2rem 0 !important; position: relative !important; z-index: 10 !important;}
-    .typing {font-style: italic !important; color: #94a3b8 !important; margin: 15px 0 !important; text-align: left !important;}
-    @keyframes blink {0%, 100% {opacity: 1;} 50% {opacity: 0;}}
-</style>
-
-<!-- JS DINÁMICO: BORRA RESIDUALES CADA 300MS (FIX DINÁMICO MÓVIL 2025) -->
-<script>
-    setInterval(() => {
-        const elements = document.querySelectorAll('button[data-testid="stDeployButton"], .stDeployButton, .stAppDeployButton, [data-testid="stChatInput"] img, [data-testid="stChatInput"] svg, [data-testid="stAvatar"], footer, [data-testid="stStatusWidget"], img[alt*="avatar"], div:contains("Streamlit"), div:contains("Hosted")');
-        elements.forEach(el => { if (el) { el.style.display = 'none'; el.remove(); } });
-    }, 300);
-</script>
-""", unsafe_allow_html=True)
-
-# ==================== CLAVE OPENAI ====================
-API_KEY = os.getenv("OPENAI_API_KEY")
-if not API_KEY:
-    st.error("⚠️ Falta la clave OPENAI_API_KEY en Secrets o .env")
-    st.stop()
-
-# ==================== CABECERA CORPORATIVA ====================
-st.markdown("""
-<div class="header-box">
-    <h1 style="margin:0; font-size: 2.4rem; font-weight: 800;">Chatbot Colaboradores</h1>
-    <h2 style="margin:10px 0 0 0; font-weight: 400; font-size: 1.4rem;">Nutrisco – Atención Personas</h2>
-    <p style="margin:15px 0 0 0; opacity: 0.9;">Escribe tu duda y te respondo al instante</p>
-</div>
-""", unsafe_allow_html=True)
-
-# ==================== INICIALIZAR CHAT ====================
-if "messages" not in st.session_state:
-    st.session_state.messages
+    .belén-box {background: #dc2626 !important; color: white !important; padding: 1.3rem !important; border-radius: 15px !important; text-align: center !important
