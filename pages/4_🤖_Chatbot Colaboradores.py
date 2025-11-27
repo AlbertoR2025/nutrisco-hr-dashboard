@@ -1,4 +1,4 @@
-# pages/4_🤖_Chatbot Colaboradores.py → VERSIÓN FINAL 2025: SIN FOTO/CORONA, SIMÉTRICO DESKTOP/MÓVIL
+# pages/4_🤖_Chatbot Colaboradores.py → VERSIÓN FINAL 2025: SIN FOTO/CORONA/GITHUB, SIMÉTRICO DESKTOP/MÓVIL
 import streamlit as st
 import pandas as pd
 import requests
@@ -14,20 +14,13 @@ st.set_page_config(
     page_title="Chatbot Colaboradores – Nutrisco",
     page_icon="💬",
     layout="centered",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="collapsed",
+    menu=None  # <--- OCULTA EL MENÚ SUPERIOR (FORK, DEPLOY, CORONA)
 )
 
-# ==================== CSS PARA OCULTAR CORONA, AVATAR Y FOOTER ====================
+# ==================== CSS PARA OCULTAR LOGO GITHUB Y FOOTER ====================
 css_code = '''
 <style>
-    /* OCULTAR CORONA ROJA */
-    .stAppDeployButton, button[data-testid="stDeployButton"], .stDeployButton {
-        display: none !important;
-        visibility: hidden !important;
-        height: 0 !important;
-        z-index: -9999 !important;
-    }
-
     /* OCULTAR LOGO GITHUB Y FOOTER */
     footer, [data-testid="stStatusWidget"], div[class*="hosted"], 
     a[href*="github.com"], span:contains("Streamlit") {
@@ -35,11 +28,6 @@ css_code = '''
         visibility: hidden !important;
         height: 0 !important;
     }
-
-    /* OCULTAR MENÚ SUPERIOR (Fork, Deploy) */
-    .stToolbar { display: none !important; }
-    .stHeader { display: none !important; }
-    .stDeployButtonContainer { display: none !important; }
 
     /* LAYOUT SIMÉTRICO RESPONSIVO */
     .main .block-container {
