@@ -1,24 +1,21 @@
-# ==================== IMPORTS LIMPIOS (sin reload - funciona en Cloud) ====================
+# Panel de Control.py → VERSIÓN FINAL 100% FUNCIONAL EN STREAMLIT CLOUD (26-nov-2025)
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# Importar data_loader SIN reload (evita errores en Cloud)
-try:
-    from utils.data_loader import load_data
-except ImportError:
-    st.error("No se encontró utils/data_loader.py. Verifica la estructura de carpetas.")
-    st.stop()
-# --------------------------------------------------------------
+# IMPORTS LIMPIOS (SIN importlib.reload → evita errores en la nube)
+from utils.data_loader import load_data
+from utils.kpi_calculator import calculate_kpis
 
+# ==================== CONFIGURACIÓN ====================
 st.set_page_config(
     page_title="Nutrisco - Inteligencia RR.HH.",
-    page_icon="orange_circle",
+    page_icon="circle",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# ==================== ESTILO FINAL IMPECABLE ====================
+# ==================== ESTILO CORPORATIVO ====================
 st.markdown("""
 <style>
     .main {background-color: #0f172a; color: white;}
@@ -30,7 +27,6 @@ st.markdown("""
         margin-bottom: 2.5rem;
         box-shadow: 0 8px 25px rgba(234, 88, 12, 0.35);
     }
-    /* TODAS LAS TARJETAS KPIs DEL MISMO TAMAÑO */
     .kpi-card {
         background: #1e293b;
         padding: 1.8rem 1rem;
@@ -48,11 +44,10 @@ st.markdown("""
     .metric-value {font-size: 3rem; font-weight: bold; color: #f97316; margin: 0.4rem 0;}
     .metric-delta {font-size: 0.95rem; font-weight: bold;}
     .section-title {color: #f97316; font-size: 1.9rem; margin: 2.5rem 0 1rem; font-weight: 600;}
-    .footer {text-align: center; margin-top: 6rem; color: #64748b; font-size: 0.9rem;}
 </style>
 """, unsafe_allow_html=True)
 
-# ==================== CABECERA ELEGANTE ====================
+# ==================== CABECERA ====================
 st.markdown("""
 <div class="header-section">
     <h1 style="margin:0; color:white; font-size:3.2rem; font-weight:800;">nutrisco.</h1>
@@ -69,15 +64,14 @@ def get_data():
 
 df = get_data()
 if df is None:
-    st.error("No se pudo cargar el archivo.")
-    st.info("Asegúrate de que el archivo esté en la carpeta **data/**")
+    st.error("No se pudo cargar el archivo de consultas.")
+    st.info("Asegúrate de que `Consultas-Atencion-Personas-Enriquecido.xlsx` esté en la carpeta **data/**")
     st.stop()
 
 st.session_state.df = df
 
-# ==================== KPIs (TODAS IGUALES) ====================
+# ==================== KPIs ====================
 try:
-    from utils.kpi_calculator import calculate_kpis
     kpis = calculate_kpis(df)
 
     col1, col2, col3, col4 = st.columns(4)
@@ -141,51 +135,37 @@ try:
     st.markdown("<h3 class='section-title'>Colaboradores con Más Consultas</h3>", unsafe_allow_html=True)
     st.dataframe(kpis['ranking_empleados'].head(10), use_container_width=True, hide_index=True)
 
-               # ==================== ÚLTIMAS 10 CONSULTAS (100% LIMPIAS Y PROFESIONALES) ====================
+    # ==================== ÚLTIMAS 10 CONSULTAS LIMPIAS ====================
     st.markdown("<h3 class='section-title'>Últimas 10 Consultas Recibidas</h3>", unsafe_allow_html=True)
     
     ultimas = df.copy()
     ultimas['Fecha '] = pd.to_datetime(ultimas['Fecha '], errors='coerce')
     ultimas = ultimas.sort_values('Fecha ', ascending=False).head(10)
 
-    # LIMPIEZA TOTAL Y DEFINITIVA DEL NOMBRE
     def limpiar_nombre(nombre):
-        if pd.isna(nombre):
-            return ""
+        if pd.isna(nombre): return ""
         texto = str(nombre).strip()
         if texto in ['', 'nan', 'None', '<NA>', 'Usuario Externo', 'Consulta Externa']:
             return ""
         return texto
 
     ultimas['Colaborador'] = ultimas['Nombre '].apply(limpiar_nombre)
-
-    # Tema y Estado
     ultimas['Tema'] = ultimas['Categoria_Consulta'].fillna('Sin categoría').replace('Otro', 'Consulta General')
     ultimas['Estado'] = ultimas['Estado_Normalizado'].fillna('Pendiente')
     ultimas['Fecha'] = ultimas['Fecha '].dt.strftime('%d/%m/%Y')
 
-    # Tabla final
     tabla = ultimas[['Fecha', 'Colaborador', 'Tema', 'Estado']].copy()
-    tabla = tabla[tabla['Colaborador'] != ""]  # Oculta filas sin colaborador
+    tabla = tabla[tabla['Colaborador'] != ""]
 
-    st.dataframe(
-        tabla,
-        use_container_width=True,
-        hide_index=True,
-        column_config={
-            "Colaborador": st.column_config.TextColumn(width="large"),
-            "Tema": st.column_config.TextColumn(width="medium"),
-            "Estado": st.column_config.TextColumn(width="small")
-        }
-    )
+    st.dataframe(tabla, use_container_width=True, hide_index=True)
 
-# ======================= FIN DEL TRY =======================
+# ==================== ERRORES ====================
 except Exception as e:
     st.error(f"Error al procesar datos: {e}")
     if df is not None:
         st.dataframe(df.head())
 
-# ======================= FOOTER CORPORATIVO (siempre visible) =======================
+# ==================== FOOTER CORPORATIVO ====================
 st.markdown("""
 <div style="text-align:center; padding:2rem 0 1rem 0; color:#94a3b8; font-size:0.95rem;">
     Inteligencia Artificial al servicio de las personas – Nutrisco
