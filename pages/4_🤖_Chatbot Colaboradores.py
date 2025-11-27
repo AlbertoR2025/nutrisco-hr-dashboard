@@ -1,4 +1,4 @@
-# pages/4_🤖_Chatbot Colaboradores.py → VERSIÓN FINAL 2025: SIN FOTO/CORONA, SIMÉTRICO DESKTOP/MÓVIL (FIX V1.38 DISCUSS #80477)
+# pages/4_🤖_Chatbot Colaboradores.py → VERSIÓN FINAL 100% LIMPIA Y SIMÉTRICA – FUNCIONA NOV 2025 (SIN FOTO/CORONA)
 import streamlit as st
 import pandas as pd
 import requests
@@ -45,6 +45,4 @@ st.markdown("""
     /* ESTILOS MENSAJES SIMÉTRICOS (MARGIN IGUAL IZQUIERDA/DERECHA) */
     [data-testid="stChatMessage"] {padding: 0 !important; gap: 0 !important;}
     .user-message {background: #262730 !important; color: white !important; border-radius: 18px !important; padding: 14px 20px !important; margin: 16px 8% 16px auto !important; max-width: 75% !important; box-shadow: 0 2px 10px rgba(0,0,0,0.4) !important;}
-    .assistant-message {background: linear-gradient(135deg, #ea580c, #f97316) !important; color: white !important; border-radius: 18px !important; padding: 14px 20px !important; margin: 16px auto 16px 8% !important; max-width: 75% !important; box-shadow: 0 4px 15px rgba(249,115,22,0.5) !important;}
-    @media (max-width: 768px) {.user-message, .assistant-message {max-width: 90% !important; padding: 12px 16px !important; margin: 12px 4% 12px auto !important;}}  /* Simétrico en móvil */
-    .header-box {background: linear-gradient(90deg, #ea580c, #c2410c) !important; padding: 2rem !important; border-radius: 20px !important
+    .assistant-message {background: linear-gradient(135deg, #ea580c, #f97316) !important
