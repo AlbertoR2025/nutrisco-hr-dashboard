@@ -14,29 +14,44 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-/* Ocultar elementos Streamlit de manera agresiva */
-header, footer, 
-[data-testid="stToolbar"], 
-[data-testid="stDeployButton"],
-[data-testid="stDecoration"],
-[data-testid="stStatusWidget"],
-.stDeployButton,
-button[title*="Deploy"],
-button[title*="View"],
-button[title*="Manage app"],
-a[href*="github"],
-a[href*="streamlit"],
-[data-testid="stSidebarNav"],
-section[data-testid="stSidebar"] > div:first-child {
+/* === ELIMINAR TODOS LOS ELEMENTOS STREAMLIT NO DESEADOS === */
+header, footer, [data-testid="stToolbar"], [data-testid="stDeployButton"],
+.stDeployButton, [data-testid="stStatusWidget"], [data-testid="stDecoration"],
+button[title*="Deploy"], button[title*="View"], a[href*="github"], a[href*="streamlit"] {
     display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    height: 0 !important;
-    width: 0 !important;
-    position: absolute !important;
-    left: -9999px !important;
 }
 
+/* === ELIMINAR COMPLETAMENTE FOTOS/AVATARES DEL CHAT === */
+[data-testid="stChatMessageAvatar"],
+[data-testid="stChatMessage"] [data-testid="stAvatar"],
+[data-testid="stChatMessage"] img,
+[data-testid="stChatMessage"] svg,
+.stChatMessage img,
+.stChatMessage svg {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0px !important;
+    height: 0px !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* === ELIMINAR EL CONTENEDOR DE AVATARES === */
+[data-testid="stChatMessage"] > div > div:first-child {
+    display: none !important;
+    width: 0px !important;
+    min-width: 0px !important;
+}
+
+/* === ELIMINAR EL ESPACIO DE AVATARES === */
+[data-testid="stChatMessage"] > div {
+    gap: 0px !important;
+    margin-left: 0px !important;
+    margin-right: 0px !important;
+    padding-left: 0px !important;
+}
+
+/* === ESTILOS EXISTENTES MEJORADOS === */
 .stApp {background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);}
 .block-container {max-width: 800px !important; margin: 0 auto !important; padding: 2rem 1rem 100px 1rem !important;}
 
@@ -79,60 +94,84 @@ section[data-testid="stSidebar"] > div:first-child {
 
 .footer {text-align: center; margin-top: 3rem; color: #94a3b8; font-size: 0.85rem; opacity: 0.7;}
 
+/* === MEJORAS PARA EL INPUT EN MÓVIL === */
+[data-testid="stChatInput"] {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: rgba(15, 23, 42, 0.95) !important;
+    backdrop-filter: blur(10px) !important;
+    padding: 16px 12px 20px 12px !important;
+    border-top: 1px solid rgba(71, 85, 105, 0.4) !important;
+    z-index: 10000 !important;
+}
+
+[data-testid="stChatInput"] > div {
+    max-width: 800px !important;
+    margin: 0 auto !important;
+}
+
 @media (max-width: 768px) {
-    .block-container {padding: 1rem 0.8rem 100px 0.8rem !important;}
+    .block-container {padding: 1rem 0.8rem 120px 0.8rem !important;}
     .header {padding: 2rem 1.5rem;}
     .header h1 {font-size: 1.8rem;}
     .user, .bot {max-width: 85%; padding: 11px 16px; font-size: 0.9rem;}
+    
+    [data-testid="stChatInput"] {
+        padding: 14px 10px 18px 10px !important;
+    }
 }
 </style>
 
+<!-- JAVASCRIPT PARA ELIMINACIÓN PERSISTENTE -->
 <script>
-// Eliminar elementos de Streamlit de forma permanente y agresiva
-(function() {
-    function removeStreamlitElements() {
-        const selectorsToRemove = [
-            'header',
-            'footer',
-            '[data-testid="stToolbar"]',
-            '[data-testid="stDeployButton"]',
-            '[data-testid="stDecoration"]',
-            '[data-testid="stStatusWidget"]',
-            '.stDeployButton',
-            'button[title*="Deploy"]',
-            'button[title*="View"]',
-            'button[title*="Manage"]',
-            'a[href*="github"]',
-            'a[href*="streamlit"]',
-            '[data-testid="stSidebarNav"]',
-            'section[data-testid="stSidebar"] > div:first-child'
-        ];
-        
-        selectorsToRemove.forEach(selector => {
-            document.querySelectorAll(selector).forEach(element => {
-                element.remove();
-            });
-        });
-    }
+function eliminarElementosPersistentes() {
+    // Eliminar avatares del chat
+    const avatares = document.querySelectorAll([
+        '[data-testid="stChatMessageAvatar"]',
+        '[data-testid="stChatMessage"] [data-testid="stAvatar"]',
+        '[data-testid="stChatMessage"] img',
+        '[data-testid="stChatMessage"] svg',
+        '.stChatMessage img',
+        '.stChatMessage svg'
+    ].join(','));
     
-    // Ejecutar inmediatamente
-    removeStreamlitElements();
-    
-    // Ejecutar cuando el DOM esté listo
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', removeStreamlitElements);
-    }
-    
-    // Ejecutar cada 500ms para elementos que se cargan dinámicamente
-    setInterval(removeStreamlitElements, 500);
-    
-    // Observador de mutaciones para elementos nuevos
-    const observer = new MutationObserver(removeStreamlitElements);
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true
+    avatares.forEach(avatar => {
+        avatar.remove();
+        avatar.style.display = 'none';
     });
-})();
+    
+    // Eliminar contenedores de avatar
+    document.querySelectorAll('[data-testid="stChatMessage"] > div > div:first-child').forEach(contenedor => {
+        contenedor.remove();
+        contenedor.style.display = 'none';
+    });
+    
+    // Eliminar elementos de Streamlit (corona, etc.)
+    const elementosStreamlit = document.querySelectorAll([
+        'header', 'footer',
+        '[data-testid="stToolbar"]',
+        '[data-testid="stDeployButton"]',
+        '[data-testid="stStatusWidget"]',
+        'button[title*="Deploy"]',
+        'button[title*="View"]'
+    ].join(','));
+    
+    elementosStreamlit.forEach(elemento => {
+        elemento.remove();
+        elemento.style.display = 'none';
+    });
+}
+
+// Ejecutar inmediatamente y de forma persistente
+document.addEventListener('DOMContentLoaded', eliminarElementosPersistentes);
+setTimeout(eliminarElementosPersistentes, 100);
+setTimeout(eliminarElementosPersistentes, 500);
+setTimeout(eliminarElementosPersistentes, 1000);
+
+// Ejecutar cada 2 segundos para elementos que puedan reaparecer
+setInterval(eliminarElementosPersistentes, 2000);
 </script>
 """, unsafe_allow_html=True)
 
