@@ -1,11 +1,10 @@
-# ===============================
-# pages/4_🤖_Chatbot Colaboradores.py
-# Versión final 2025 — Sin avatar, sin corona, full responsive
-# ===============================
-
+# pages/4_🤖_Chatbot Colaboradores.py → VERSIÓN FINAL 2025: SIN FOTO/CORONA, SIMÉTRICO DESKTOP/MÓVIL
 import streamlit as st
+import pandas as pd
+import requests
 import os
 import time
+from datetime import datetime
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -18,55 +17,63 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# ==================== CSS + JS — ELIMINA AVATAR Y CORONA ====================
-
-css_code = """
+# ==================== INYECTAR CSS Y JS DIRECTAMENTE EN EL DOM ====================
+# Usamos st.components.v1.html para inyectar HTML puro
+html_code = '''
 <style>
+    /* OCULTAR CORONA ROJA */
+    .stAppDeployButton, button[data-testid="stDeployButton"], .stDeployButton {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        z-index: -9999 !important;
+    }
 
-    /* Fondo general */
+    /* OCULTAR LOGO GITHUB Y FOOTER */
+    footer, [data-testid="stStatusWidget"], div[class*="hosted"], 
+    a[href*="github.com"], span:contains("Streamlit") {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+    }
+
+    /* OCULTAR AVATAR EN INPUT DE CHAT */
+    [data-testid="stChatInput"] > div > div > div > img,
+    [data-testid="stChatInput"] > div > div > div > svg,
+    [data-testid="stChatInput"] > div > div > div > [alt*="avatar"],
+    [data-testid="stChatInput"] > div > div > div > [data-testid="stAvatar"] {
+        display: none !important;
+        visibility: hidden !important;
+        width: 0 !important;
+        height: 0 !important;
+        opacity: 0 !important;
+    }
+
+    /* OCULTAR AVATARES EN MENSAJES DEL CHAT */
+    [data-testid="stChatMessage"] > div > img,
+    [data-testid="stChatMessage"] > div > svg,
+    [data-testid="stChatMessage"] > div > [data-testid="stAvatar"] {
+        display: none !important;
+        visibility: hidden !important;
+        width: 0 !important;
+        height: 0 !important;
+    }
+
+    /* LAYOUT SIMÉTRICO RESPONSIVO */
+    .main .block-container {
+        max-width: 800px !important;
+        margin: 0 auto !important;
+        padding: 1rem !important;
+        width: auto !important;
+    }
+    @media (max-width: 768px) {
+        .main .block-container { width: 95% !important; padding: 0.5rem !important; }
+        [data-testid="stChatInput"] { max-width: 100% !important; margin: 0 auto !important; padding-bottom: 2rem !important; }
+    }
     .stApp { background-color: #0e1117 !important; }
 
-    /* Ocultar avatar del input del chat */
-    [data-testid="stChatInput"] img,
-    [data-testid="stChatInput"] svg {
-        display: none !important;
-        visibility: hidden !important;
-    }
-
-    /* Ocultar contenedor lateral del avatar del input */
-    [data-testid="stChatInput"] div:first-child {
-        display: none !important;
-    }
-
-    /* Ocultar avatares en los mensajes */
-    [data-testid="stChatMessage"] img,
-    [data-testid="stChatMessage"] svg {
-        display: none !important;
-        visibility: hidden !important;
-    }
-
-    /* Ocultar la corona roja (Deploy Button) */
-    [data-testid="stDeployButton"],
-    .stAppDeployButton,
-    .stDeployButton,
-    button[title="Manage app"] {
-        display: none !important;
-        visibility: hidden !important;
-    }
-
-    /* Ocultar toolbar, footer, logos externos */
-    [data-testid="stToolbar"],
-    footer,
-    .stStatusWidget,
-    .stDeployButton {
-        display: none !important;
-        visibility: hidden !important;
-    }
-
-    /* Mantener simetría del chat */
+    /* ESTILOS MENSAJES SIMÉTRICOS */
     [data-testid="stChatMessage"] { padding: 0 !important; gap: 0 !important; }
-
-    /* Mensaje del usuario */
     .user-message {
         background: #262730 !important;
         color: white !important;
@@ -76,8 +83,6 @@ css_code = """
         max-width: 75% !important;
         box-shadow: 0 2px 10px rgba(0,0,0,0.4) !important;
     }
-
-    /* Mensaje del asistente */
     .assistant-message {
         background: linear-gradient(135deg, #ea580c, #f97316) !important;
         color: white !important;
@@ -87,8 +92,15 @@ css_code = """
         max-width: 75% !important;
         box-shadow: 0 4px 15px rgba(249,115,22,0.5) !important;
     }
+    @media (max-width: 768px) {
+        .user-message, .assistant-message {
+            max-width: 90% !important;
+            padding: 12px 16px !important;
+            margin: 12px 4% 12px auto !important;
+        }
+    }
 
-    /* Header Box */
+    /* HEADER BOX */
     .header-box {
         background: linear-gradient(90deg, #ea580c, #c2410c) !important;
         padding: 2rem !important;
@@ -96,105 +108,98 @@ css_code = """
         text-align: center !important;
         color: white !important;
         box-shadow: 0 10px 30px rgba(234,88,12,0.4) !important;
-        margin-bottom: 15px !important;
-        margin-top: 10px !important;
+        margin: 0 auto !important;
     }
-
-    /* Responsivo móvil */
     @media (max-width: 768px) {
         .header-box { padding: 1.5rem !important; }
-        .user-message, .assistant-message {
-            max-width: 90% !important;
-            margin-left: 4% !important;
-            margin-right: 4% !important;
-            padding: 12px 16px !important;
-        }
     }
 
+    /* BELÉN BOX */
+    .belén-box {
+        background: #dc2626 !important;
+        color: white !important;
+        padding: 1.3rem !important;
+        border-radius: 15px !important;
+        text-align: center !important;
+    }
+
+    /* EXTRA: OCULTAR BOTÓN DE "FORK" O "GITHUB" SI APARECE */
+    [data-testid="stGitHubButton"], button[aria-label="Fork this app"], [data-testid="stToolbar"] {
+        display: none !important;
+    }
+
+    /* OCULTAR CONTENEDOR DEL AVATAR EN INPUT */
+    [data-testid="stChatInput"] > div > div > div {
+        display: none !important;
+    }
+
+    /* OCULTAR CONTENEDOR DEL AVATAR EN MENSAJES */
+    [data-testid="stChatMessage"] > div {
+        display: none !important;
+    }
 </style>
-"""
-st.markdown(css_code, unsafe_allow_html=True)
 
-js_code = """
 <script>
-document.addEventListener("DOMContentLoaded", function() {
+// Inyecta el CSS en el DOM
+document.head.innerHTML += '<style>' + document.querySelector('style').textContent + '</style>';
 
-    // Ocultar avatar del input (Streamlit móvil/desktop variación)
-    const removeInputAvatar = setInterval(() => {
-        const avatar = document.querySelector('[data-testid="stChatInput"] img');
-        if (avatar) { avatar.remove(); clearInterval(removeInputAvatar); }
-    }, 200);
+// Espera a que todo esté cargado
+window.addEventListener('load', function() {
+    // Oculta la corona roja
+    const crown = document.querySelector('.stAppDeployButton') || 
+                  document.querySelector('[data-testid="stDeployButton"]') || 
+                  document.querySelector('.stDeployButton');
+    if (crown) crown.style.display = 'none';
 
-    // Ocultar contenedor del avatar del input
-    const removeContainer = setInterval(() => {
-        const avatarDiv = document.querySelector('[data-testid="stChatInput"] div div div');
-        if (avatarDiv) { avatarDiv.style.display = "none"; clearInterval(removeContainer); }
-    }, 200);
+    // Oculta avatar en input
+    const avatarInInput = document.querySelector('[data-testid="stChatInput"] > div > div > div > img') ||
+                          document.querySelector('[data-testid="stChatInput"] > div > div > div > svg') ||
+                          document.querySelector('[data-testid="stChatInput"] > div > div > div > [alt*="avatar"]');
+    if (avatarInInput) avatarInInput.style.display = 'none';
 
-    // Ocultar avatares dinámicos dentro del chat
-    const observer = new MutationObserver(() => {
-        document.querySelectorAll('[data-testid="stChatMessage"] img, [data-testid="stChatMessage"] svg')
-        .forEach(el => { el.style.display = "none"; el.style.visibility = "hidden"; });
-    });
+    // Oculta avatares en mensajes
+    const messageAvatars = document.querySelectorAll('[data-testid="stChatMessage"] > div > img, [data-testid="stChatMessage"] > div > svg, [data-testid="stChatMessage"] > div > [data-testid="stAvatar"]');
+    messageAvatars.forEach(el => el.style.display = 'none');
 
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    // Ocultar la corona / deploy button
-    const crownSelectors = [
-        '[data-testid="stDeployButton"]',
-        '.stAppDeployButton',
-        '.stDeployButton',
-        'button[title="Manage app"]'
-    ];
-    crownSelectors.forEach(sel => {
-        const el = document.querySelector(sel);
-        if (el) { el.style.display = "none"; el.style.visibility = "hidden"; }
-    });
-
+    // Oculta footer y GitHub
+    const footerElements = document.querySelectorAll('footer, [data-testid="stStatusWidget"], div[class*="hosted"], a[href*="github.com"]');
+    footerElements.forEach(el => el.style.display = 'none');
 });
 </script>
-"""
-st.markdown(js_code, unsafe_allow_html=True)
+'''
 
-# ==================== HEADER DEL CHAT ====================
+# Aplica el HTML usando st.components.v1.html
+try:
+    from streamlit.components.v1 import html
+    html(html_code, height=0)
+except Exception as e:
+    # Si no funciona, usa st.write como backup
+    st.write(html_code, unsafe_allow_html=True)
 
+# ==================== CONTENIDO DEL CHATBOT ====================
+st.markdown('<div class="header-box"><h1>Chatbot Colaboradores</h1><p>Nutrisco – Atención Personas</p><p>Escribe tu duda y te respondo al instante</p></div>', unsafe_allow_html=True)
+
+# Mensaje inicial
 st.markdown("""
-<div class="header-box">
-    <h1>Chatbot Colaboradores</h1>
-    <p>Nutrisco – Atención Personas</p>
-    <p>Escribe tu duda y te respondo al instante</p>
-</div>
-""", unsafe_allow_html=True)
-
-# ==================== MENSAJE INICIAL ====================
-
-st.markdown("""
-<div class="assistant-message">
+<div style="padding: 16px; background: linear-gradient(135deg, #ea580c, #f97316); color: white; border-radius: 18px; margin: 16px auto 16px 8%; max-width: 75%; box-shadow: 0 4px 15px rgba(249,115,22,0.5); text-align: left;">
     ¡Hola! 🤝 Soy parte del equipo de <strong>Atención a Personas</strong> de Nutrisco.<br><br>
-    Puedes preguntarme cualquier cosa: licencias, beneficios, BUK, finiquitos, vestimenta,
-    bono Fisherman, etc.<br><br>
+    Puedes preguntarme cualquier cosa: licencias, beneficios, BUK, finiquitos, vestimenta, bono Fisherman, etc.<br><br>
     ¡Estoy aquí para ayudarte!
 </div>
 """, unsafe_allow_html=True)
 
-# ==================== INPUT DEL CHAT ====================
-
+# Input de chat
 user_input = st.chat_input("Escribe tu consulta aquí...")
 
 if user_input:
-    # Mensaje del usuario
-    st.markdown(
-        f'<div class="user-message">{user_input}</div>',
-        unsafe_allow_html=True
-    )
+    st.markdown(f"""
+<div style="padding: 14px 20px; background: #262730; color: white; border-radius: 18px; margin: 16px 8% 16px auto; max-width: 75%; box-shadow: 0 2px 10px rgba(0,0,0,0.4); text-align: left;">
+    {user_input}
+</div>
+""", unsafe_allow_html=True)
 
-    # Mensaje temporal del asistente
     st.markdown("""
-    <div class="assistant-message">
-        Gracias por tu pregunta. Estoy procesando la respuesta...
-    </div>
-    """, unsafe_allow_html=True)
-
-    # Aquí conectas tu agente real en otro paso
-    # respuesta = agente(user_input)
-    # st.markdown(f'<div class="assistant-message">{respuesta}</div>', unsafe_allow_html=True)
+<div style="padding: 14px 20px; background: linear-gradient(135deg, #ea580c, #f97316); color: white; border-radius: 18px; margin: 16px auto 16px 8%; max-width: 75%; box-shadow: 0 4px 15px rgba(249,115,22,0.5); text-align: left;">
+    Gracias por tu pregunta. Estoy procesando la respuesta...
+</div>
+""", unsafe_allow_html=True)
