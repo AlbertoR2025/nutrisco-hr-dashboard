@@ -3,7 +3,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# IMPORTS LIMPIOS (SIN NADA DE importlib.reload)
+# IMPORTS LIMPIOS (sin importlib.reload
 from utils.data_loader import load_data
 from utils.kpi_calculator import calculate_kpis
 
@@ -24,7 +24,7 @@ st.markdown("""
         border-radius: 16px;
         text-align: center;
         margin-bottom: 2.5rem;
-        box-shadow: 0 8px 25px rgba(234, 88, 12, 0.35);
+        box-shadow: 0 8px 25px rgba(234,88,12,0.35);
     }
     .kpi-card {
         background: #1e293b;
@@ -41,7 +41,6 @@ st.markdown("""
     .kpi-card:hover {transform: translateY(-5px); transition: 0.2s;}
     .metric-label {font-size: 1rem; color: #94a3b8;}
     .metric-value {font-size: 3rem; font-weight: bold; color: #f97316;}
-    .metric-delta {font-size: 0.95rem;}
     .section-title {color: #f97316; font-size: 1.9rem; margin: 2.5rem 0 1rem;}
 </style>
 """, unsafe_allow_html=True)
@@ -64,7 +63,7 @@ def get_data():
 df = get_data()
 if df is None:
     st.error("No se pudo cargar el archivo.")
-    st.info("Asegúrate de que el archivo esté en la carpeta **data/**")
+    st.info("Asegúrate de que esté en la carpeta **data/**")
     st.stop()
 
 st.session_state.df = df
@@ -73,61 +72,52 @@ st.session_state.df = df
 try:
     kpis = calculate_kpis(df)
 
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
+    c1, c2, c3, c4 = st.columns(4)
+    with c1:
         st.markdown(f'<div class="kpi-card"><div class="metric-label">Total Consultas</div><div class="metric-value">{kpis["total_consultas"]:,}</div></div>', unsafe_allow_html=True)
-    with col2:
-        st.markdown(f'<div class="kpi-card"><div class="metric-label">Consultas Urgentes</div><div class="metric-value">{kpis["urgentes"]}</div><div class="metric-delta" style="color:#f87171;">Prioridad alta</div></div>', unsafe_allow_html=True)
-    with col3:
+    with c2:
+        st.markdown(f'<div class="kpi-card"><div class="metric-label">Consultas Urgentes</div><div class="metric-value">{kpis["urgentes"]}</div></div>', unsafe_allow_html=True)
+    with c3:
         color = "#10b981" if kpis["trpc"] >= 70 else "#f87171"
-        st.markdown(f'<div class="kpi-card"><div class="metric-label">Resolución Primer Contacto</div><div class="metric-value">{kpis["trpc"]:.1f}%</div><div class="metric-delta" style="color:{color}">Meta >70%</div></div>', unsafe_allow_html=True)
-    with col4:
-        st.markdown(f'<div class="kpi-card"><div class="metric-label">Tasa de Derivación</div><div class="metric-value">{kpis["tasa_derivacion"]:.1f}%</div><div class="metric-delta" style="color:#34d399;">Menor es mejor</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="kpi-card"><div class="metric-label">Resolución 1er Contacto</div><div class="metric-value">{kpis["trpc"]:.1f}%</div><div style="color:{color}">Meta >70%</div></div>', unsafe_allow_html=True)
+    with c4:
+        st.markdown(f'<div class="kpi-card"><div class="metric-label">Tasa Derivación</div><div class="metric-value">{kpis["tasa_derivacion"]:.1f}%</div></div>', unsafe_allow_html=True)
 
     st.markdown("---")
 
     col1, col2 = st.columns([1.7, 1.3])
     with col1:
         st.markdown("<h3 class='section-title'>Top 5 Temas Más Recurrentes</h3>", unsafe_allow_html=True)
-        top_df = kpis['top_categorias'].copy()
-        top_df['Categoría'] = top_df['Categoría'].replace('Otro', 'Consulta General')
-        st.dataframe(top_df, use_container_width=True, hide_index=True)
+        top = kpis['top_categorias'].copy()
+        top['Categoría'] = top['Categoría'].replace('Otro', 'Consulta General')
+        st.dataframe(top, use_container_width=True, hide_index=True)
+
     with col2:
         st.markdown("<h3 class='section-title'>Distribución por Área</h3>", unsafe_allow_html=True)
         fig = px.pie(kpis['distribucion_area'], values='Frecuencia', names='Área', hole=0.5,
                      color_discrete_sequence=px.colors.sequential.Oranges)
-        fig.update_layout(showlegend=False, margin=dict(t=0,b=0,l=0,r=0))
+        fig.update_layout(showlegend=False)
         st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("---")
     st.markdown("<h3 class='section-title'>Colaboradores con Más Consultas</h3>", unsafe_allow_html=True)
     st.dataframe(kpis['ranking_empleados'].head(10), use_container_width=True, hide_index=True)
 
-    st.markdown("<h3 class='section-title'>Últimas 10 Consultas Recibidas</h3>", unsafe_allow_html=True)
-    ultimas = df.copy()
-    ultimas['Fecha '] = pd.to_datetime(ultimas['Fecha '], errors='coerce')
-    ultimas = ultimas.sort_values('Fecha ', ascending=False).head(10)
-
-    def limpiar_nombre(x):
-        if pd.isna(x): return ""
-        t = str(x).strip()
-        if t in ['', 'nan', 'None', '<NA>', 'Usuario Externo', 'Consulta Externa']: return ""
-        return t
-
-    ultimas['Colaborador'] = ultimas['Nombre '].apply(limpiar_nombre)
-    ultimas['Tema'] = ultimas['Categoria_Consulta'].fillna('Sin categoría').replace('Otro', 'Consulta General')
-    ultimas['Estado'] = ultimas['Estado_Normalizado'].fillna('Pendiente')
-    ultimas['Fecha'] = ultimas['Fecha '].dt.strftime('%d/%m/%Y')
-
-    tabla = ultimas[['Fecha', 'Colaborador', 'Tema', 'Estado']][ultimas['Colaborador'] != ""]
-    st.dataframe(tabla, use_container_width=True, hide_index=True)
+    st.markdown("<h3 class='section-title'>Últimas 10 Consultas</h3>", unsafe_allow_html=True)
+    ult = df.copy()
+    ult['Fecha '] = pd.to_datetime(ult['Fecha '], errors='coerce')
+    ult = ult.sort_values('Fecha ', ascending=False).head(10)
+    ult['Colaborador'] = ult['Nombre '].fillna('').astype(str).str.strip()
+    ult = ult[ult['Colaborador'].str.len() > 0]
+    ult['Tema'] = ult['Categoria_Consulta'].fillna('Sin categoría').replace('Otro', 'Consulta General')
+    ult['Estado'] = ult['Estado_Normalizado'].fillna('Pendiente')
+    ult['Fecha'] = ult['Fecha '].dt.strftime('%d/%m/%Y')
+    st.dataframe(ult[['Fecha', 'Colaborador', 'Tema', 'Estado']], use_container_width=True, hide_index=True)
 
 except Exception as e:
     st.error(f"Error: {e}")
-    if 'df' in locals():
-        st.dataframe(df.head())
 
-# ==================== FOOTER CORPORATIVO ====================
+# ==================== FOOTER ====================
 st.markdown("""
 <div style="text-align:center; padding:2rem 0 1rem 0; color:#94a3b8; font-size:0.95rem;">
     Inteligencia Artificial al servicio de las personas – Nutrisco
