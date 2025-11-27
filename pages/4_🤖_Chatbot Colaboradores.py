@@ -1,4 +1,4 @@
-# pages/4_🤖_Chatbot Colaboradores.py → VERSIÓN FINAL 2025: SIN CORONA/FOTO/CUADRADO/LOGO GITHUB, NAVEGACIÓN OK (FIX V1.38 FOROS)
+# pages/4_🤖_Chatbot Colaboradores.py → VERSIÓN FINAL 2025: SIN CORONA/FOTO/CUADRADO/LOGO GITHUB/HOSTED, NAVEGACIÓN OK (FIXES DISCUSS NOV 2025)
 import streamlit as st
 import pandas as pd
 import requests
@@ -16,24 +16,24 @@ st.set_page_config(
     initial_sidebar_state="collapsed"  # Hamburguesa visible para volver atrás
 )
 
-# ==================== CSS DEFINITIVO 2025 (DE DISCUSS.STREAMLIT.IO – .stAppDeployButton PARA CORONA) ====================
+# ==================== CSS + JS DEFINITIVO 2025 (DE DISCUSS.STREAMLIT.IO – .stAppDeployButton + JS STREAMLIT.IO) ====================
 st.markdown("""
 <style>
-    /* OCULTAR CORONA ROJA (DEPLOY BUTTON V1.38+) */
+    /* OCULTAR CORONA ROJA (DEPLOY BUTTON V1.38+ - DE DISCUSS #80477) */
     .stAppDeployButton {visibility: hidden !important; display: none !important;}
     button[data-testid="stDeployButton"], .stDeployButton {display: none !important; visibility: hidden !important; height: 0 !important; z-index: -1 !important;}
 
-    /* OCULTAR HOSTED FOOTER Y LOGO GITHUB (FORK BUTTON) */
+    /* OCULTAR HOSTED FOOTER Y LOGO GITHUB (FORK BUTTON - DE FOROS NOV 2025) */
     footer, [data-testid="stStatusWidget"], div[class*="hosted"], div:contains("Streamlit") {display: none !important; visibility: hidden !important; height: 0 !important;}
     a[href*="github.com"] {display: none !important;}  /* Oculta logo GitHub/fork */
 
-    /* OCULTAR FOTO/AVATAR/CUADRADO EN INPUT (FIX #12132 MÓVIL) */
+    /* OCULTAR FOTO/AVATAR/CUADRADO EN INPUT (FIX #12132 MÓVIL - [kind="avatar"]) */
     [data-testid="stChatInput"] img, [data-testid="stChatInput"] svg, [data-testid="stChatInput"] [kind="avatar"], [data-testid="stChatInput"] [alt*="avatar"] {display: none !important; visibility: hidden !important; width: 0 !important; height: 0 !important; opacity: 0 !important;}
 
     /* OCULTAR AVATARES EN MENSAJES */
     [data-testid="stChatMessage"] img, [data-testid="stChatMessage"] svg, [data-testid="stAvatar"] {display: none !important; visibility: hidden !important; width: 0 !important; height: 0 !important;}
 
-    /* LAYOUT RESPONSIVO CENTRADO (SIN DESCUADRADO – MEDIA QUERIES NOV 2025) */
+    /* LAYOUT RESPONSIVO CENTRADO (SIN DESCUADRADO – MEDIA QUERIES + PADDING INPUT MÓVIL) */
     .main .block-container {max-width: 800px !important; margin: 0 auto !important; padding: 1rem !important; width: auto !important;}
     @media (max-width: 768px) {
         .main .block-container {width: 95% !important; padding: 0.5rem !important;}
@@ -55,7 +55,7 @@ st.markdown("""
     @keyframes blink {0%, 100% {opacity: 1;} 50% {opacity: 0;}}
 </style>
 
-<!-- JS DINÁMICO: BORRA LOGO GITHUB, HOSTED, CORONA (DE FOROS NOV 2025) -->
+<!-- JS DINÁMICO: BORRA LOGO GITHUB, HOSTED, CORONA (DE DISCUSS NOV 2025) -->
 <script>
 window.top.document.querySelectorAll(`a[href*="github.com"], a[href*="streamlit.io"]`).forEach(e => e.setAttribute("style", "display: none;"));
 setInterval(() => {
@@ -82,85 +82,4 @@ st.markdown("""
 
 # ==================== INICIALIZAR CHAT ====================
 if "messages" not in st.session_state:
-    st.session_state.messages = [{
-        "role": "assistant",
-        "content": "¡Hola! 👋 Soy parte del equipo de **Atención a Personas** de Nutrisco.\n\nPuedes preguntarme cualquier cosa: licencias, beneficios, BUK, finiquitos, vestimenta, bono Fisherman, etc.\n\n¡Estoy aquí para ayudarte!"
-    }]
-
-# ==================== MOSTRAR HISTORIAL ====================
-for msg in st.session_state.messages:
-    with st.chat_message(msg["role"], avatar=None):
-        st.markdown(f'<div class="{ "user-message" if msg["role"] == "user" else "assistant-message" }">{msg["content"]}</div>', unsafe_allow_html=True)
-
-# ==================== INPUT Y PROCESAMIENTO ====================
-if pregunta := st.chat_input("Escribe tu consulta aquí..."):
-    st.session_state.messages.append({"role": "user", "content": pregunta})
-    with st.chat_message("user", avatar=None):
-        st.markdown(f'<div class="user-message">{pregunta}</div>', unsafe_allow_html=True)
-
-    with st.chat_message("assistant", avatar=None):
-        placeholder = st.empty()
-        placeholder.markdown('<div class="typing">Escribiendo<span style="animation: blink 1s infinite;">...</span></div>', unsafe_allow_html=True)
-        time.sleep(1.3)
-        placeholder.empty()
-
-        try:
-            response = requests.post(
-                "https://api.openai.com/v1/chat/completions",
-                headers={"Authorization": f"Bearer {API_KEY}"},
-                json={
-                    "model": "gpt-4o-mini",
-                    "temperature": 0.7,
-                    "max_tokens": 600,
-                    "messages": [
-                        {"role": "system", "content": "Eres una persona real del equipo de RR.HH. de Nutrisco en Chile. Hablas español chileno, cercano, profesional y amable. Nunca digas que eres IA. Si el tema es delicado (acoso, conflicto, denuncia), deriva con mucho tacto a Belén Bastías."},
-                        {"role": "user", "content": pregunta}
-                    ]
-                },
-                timeout=30
-            )
-            respuesta = response.json()["choices"][0]["message"]["content"]
-        except Exception as e:
-            respuesta = "Uy, justo ahora tengo un problema de conexión. Mejor escribe a **belen.bastias@nutrisco.com** o llama al interno **7219**. ¡Perdona las molestias!"
-
-        st.markdown(f'<div class="assistant-message">{respuesta}</div>', unsafe_allow_html=True)
-    st.session_state.messages.append({"role": "assistant", "content": respuesta})
-
-    # Temas sensibles
-    sensibles = ["agresi", "acoso", "denuncia", "conflicto", "pelea", "maltrato", "insulto", "abus", "discrimin"]
-    if any(p in pregunta.lower() for p in sensibles):
-        st.markdown("""
-        <div class="belén-box">
-            Este tema es muy importante<br>
-            <strong>Belén Bastías Hurtado</strong> te puede ayudar personalmente<br>
-            📧 belen.bastias@nutrisco.com | ☎ Interno: 7219
-        </div>
-        """, unsafe_allow_html=True)
-
-    # Guardar historial
-    try:
-        nuevo = pd.DataFrame([{
-            "Fecha": datetime.now().strftime("%d/%m/%Y %H:%M"),
-            "Pregunta": pregunta,
-            "Respuesta": respuesta
-        }])
-        archivo = "data/historial_chatbot.xlsx"
-        os.makedirs("data", exist_ok=True)
-        if os.path.exists(archivo):
-            df_antiguo = pd.read_excel(archivo)
-            df_final = pd.concat([df_antiguo, nuevo], ignore_index=True)
-        else:
-            df_final = nuevo
-        df_final.to_excel(archivo, index=False)
-    except:
-        pass
-
-    st.rerun()
-
-# ==================== FOOTER ====================
-st.markdown("""
-<div class="footer">
-    <br>
-    Inteligencia Artificial al servicio de las personas – Nutrisco © 2025
-</div>
-""", unsafe_allow_html=True)
+    st.session_state.messages
