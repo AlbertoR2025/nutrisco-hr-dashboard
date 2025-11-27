@@ -1,8 +1,6 @@
-# pages/4_🤖_Chatbot Colaboradores.py → VERSIÓN FINAL 2025: MODERNO, FUNCIONAL Y RESPONSIIVO
 import streamlit as st
 import requests
 import os
-from datetime import datetime
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -14,20 +12,34 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# ========== CSS MODERNO Y LIMPIO + OCULTAR CORONA Y AVATAR ==========
 st.markdown("""
 <style>
-/* Ocultar elementos Streamlit agresivamente */
-header, footer, [data-testid="stToolbar"], [data-testid="stDeployButton"],
-.stDeployButton, [data-testid="stStatusWidget"], [data-testid="stDecoration"] {
+/* Ocultar elementos Streamlit de manera agresiva */
+header, footer, 
+[data-testid="stToolbar"], 
+[data-testid="stDeployButton"],
+[data-testid="stDecoration"],
+[data-testid="stStatusWidget"],
+.stDeployButton,
+button[title*="Deploy"],
+button[title*="View"],
+button[title*="Manage app"],
+a[href*="github"],
+a[href*="streamlit"],
+[data-testid="stSidebarNav"],
+section[data-testid="stSidebar"] > div:first-child {
     display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    width: 0 !important;
+    position: absolute !important;
+    left: -9999px !important;
 }
 
-/* Fondo limpio */
 .stApp {background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);}
 .block-container {max-width: 800px !important; margin: 0 auto !important; padding: 2rem 1rem 100px 1rem !important;}
 
-/* Header moderno y centrado */
 .header {
     background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
     padding: 2.8rem 2rem;
@@ -41,7 +53,6 @@ header, footer, [data-testid="stToolbar"], [data-testid="stDeployButton"],
 .header h2 {font-size: 1.25rem; font-weight: 400; margin: 0.8rem 0 0 0; opacity: 0.95;}
 .header p {margin: 0.8rem 0 0 0; opacity: 0.9; font-size: 1rem;}
 
-/* Burbujas estilo WhatsApp/iOS modernas */
 .user {
     background: linear-gradient(135deg, #3b82f6, #2563eb);
     color: white;
@@ -68,92 +79,63 @@ header, footer, [data-testid="stToolbar"], [data-testid="stDeployButton"],
 
 .footer {text-align: center; margin-top: 3rem; color: #94a3b8; font-size: 0.85rem; opacity: 0.7;}
 
-/* Responsive móvil */
 @media (max-width: 768px) {
     .block-container {padding: 1rem 0.8rem 100px 0.8rem !important;}
     .header {padding: 2rem 1.5rem;}
     .header h1 {font-size: 1.8rem;}
     .user, .bot {max-width: 85%; padding: 11px 16px; font-size: 0.9rem;}
 }
-
-/* OCULTAR CORONA ROJA Y AVATAR EN EL INPUT */
-[data-testid="stChatInput"] > div > div > div > img,
-[data-testid="stChatInput"] > div > div > div > svg,
-[data-testid="stChatInput"] > div > div > div > [alt*="avatar"],
-[data-testid="stChatInput"] > div > div > div > [data-testid="stAvatar"] {
-    display: none !important;
-    visibility: hidden !important;
-    width: 0 !important;
-    height: 0 !important;
-    opacity: 0 !important;
-}
-
-/* OCULTAR AVATARES EN MENSAJES DEL CHAT */
-[data-testid="stChatMessage"] > div > img,
-[data-testid="stChatMessage"] > div > svg,
-[data-testid="stChatMessage"] > div > [data-testid="stAvatar"] {
-    display: none !important;
-    visibility: hidden !important;
-    width: 0 !important;
-    height: 0 !important;
-}
-
-/* OCULTAR CONTENEDOR DEL AVATAR EN INPUT */
-[data-testid="stChatInput"] > div > div > div {
-    display: none !important;
-}
-
-/* OCULTAR CONTENEDOR DEL AVATAR EN MENSAJES */
-[data-testid="stChatMessage"] > div {
-    display: none !important;
-}
 </style>
 
 <script>
-// Ocultar corona y avatar específicos
-function hideCrownAndAvatar() {
-    // Oculta la corona roja
-    const crown = document.querySelector('.stAppDeployButton') || 
-                 document.querySelector('[data-testid="stDeployButton"]') || 
-                 document.querySelector('.stDeployButton');
-    if (crown) {
-        crown.style.display = 'none';
-        crown.style.visibility = 'hidden';
+// Eliminar elementos de Streamlit de forma permanente y agresiva
+(function() {
+    function removeStreamlitElements() {
+        const selectorsToRemove = [
+            'header',
+            'footer',
+            '[data-testid="stToolbar"]',
+            '[data-testid="stDeployButton"]',
+            '[data-testid="stDecoration"]',
+            '[data-testid="stStatusWidget"]',
+            '.stDeployButton',
+            'button[title*="Deploy"]',
+            'button[title*="View"]',
+            'button[title*="Manage"]',
+            'a[href*="github"]',
+            'a[href*="streamlit"]',
+            '[data-testid="stSidebarNav"]',
+            'section[data-testid="stSidebar"] > div:first-child'
+        ];
+        
+        selectorsToRemove.forEach(selector => {
+            document.querySelectorAll(selector).forEach(element => {
+                element.remove();
+            });
+        });
     }
-
-    // Oculta avatar en input
-    const avatarInInput = document.querySelector('[data-testid="stChatInput"] > div > div > div > img') ||
-                         document.querySelector('[data-testid="stChatInput"] > div > div > div > svg') ||
-                         document.querySelector('[data-testid="stChatInput"] > div > div > div > [alt*="avatar"]');
-    if (avatarInInput) {
-        avatarInInput.style.display = 'none';
-        avatarInInput.style.visibility = 'hidden';
+    
+    // Ejecutar inmediatamente
+    removeStreamlitElements();
+    
+    // Ejecutar cuando el DOM esté listo
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', removeStreamlitElements);
     }
-
-    // Oculta avatares en mensajes
-    const messageAvatars = document.querySelectorAll('[data-testid="stChatMessage"] > div > img, [data-testid="stChatMessage"] > div > svg, [data-testid="stChatMessage"] > div > [data-testid="stAvatar"]');
-    messageAvatars.forEach(el => {
-        el.style.display = 'none';
-        el.style.visibility = 'hidden';
+    
+    // Ejecutar cada 500ms para elementos que se cargan dinámicamente
+    setInterval(removeStreamlitElements, 500);
+    
+    // Observador de mutaciones para elementos nuevos
+    const observer = new MutationObserver(removeStreamlitElements);
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
     });
-}
-
-// Ejecutar al cargar
-document.addEventListener('DOMContentLoaded', function() {
-    hideCrownAndAvatar();
-});
-
-// Reintentar cada segundo durante 10 segundos
-let attempts = 0;
-setInterval(function() {
-    hideCrownAndAvatar();
-    attempts++;
-    if (attempts > 10) clearInterval(this);
-}, 1000);
+})();
 </script>
 """, unsafe_allow_html=True)
 
-# ========== LÓGICA DEL CHATBOT ==========
 API_KEY = os.getenv("OPENAI_API_KEY")
 if not API_KEY:
     st.error("⚠️ Falta configurar OPENAI_API_KEY")
@@ -179,13 +161,12 @@ for msg in st.session_state.messages:
     else:
         st.markdown(f'<div class="bot">{msg["content"]}</div>', unsafe_allow_html=True)
 
-# Input con Enter automático
 if prompt := st.chat_input("Escribe tu consulta aquí..."):
     st.session_state.messages.append({"role": "user", "content": prompt})
     
     try:
         resp = requests.post(
-            "https://api.openai.com/v1/chat/completions  ",
+            "https://api.openai.com/v1/chat/completions",
             headers={"Authorization": f"Bearer {API_KEY}"},
             json={
                 "model": "gpt-4o-mini",
