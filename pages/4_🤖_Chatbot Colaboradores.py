@@ -1,4 +1,4 @@
-# pages/4_🤖_Chatbot Colaboradores.py → VERSIÓN FINAL 2025: SIN AVATAR INPUT/MENSAJES/CORONA, CENTRADO RESPONSIVO (FIXES 2025)
+# pages/4_🤖_Chatbot Colaboradores.py → VERSIÓN FINAL CON STREAMLIT-CHAT: SIN AVATARES NI CORONA, 100% CORPORATIVO (NOV 2025)
 import streamlit as st
 import pandas as pd
 import requests
@@ -6,6 +6,7 @@ import os
 import time
 from datetime import datetime
 from dotenv import load_dotenv
+from streamlit_chat import message  # INSTALADO CON pip install streamlit-chat
 load_dotenv()
 
 # ==================== CONFIGURACIÓN GLOBAL ====================
@@ -13,55 +14,28 @@ st.set_page_config(
     page_title="Chatbot Colaboradores – Nutrisco",
     page_icon="💬",
     layout="centered",
-    initial_sidebar_state="collapsed"  # Hamburguesa visible
+    initial_sidebar_state="collapsed"
 )
 
-# ==================== CSS + JS DEFINITIVO 2025 (DE FOROS Y RELEASE NOTES - BORRA AVATAR INPUT Y CORONA) ====================
+# ==================== CSS LIGERO: OCULTA RESIDUALES, LAYOUT RESPONSIVO ====================
 st.markdown("""
 <style>
-    /* OCULTAR CORONA ROJA (DEPLOY BUTTON) Y HOSTED FOOTER (FIX 2025) */
-    .stDeployButton {display: none !important;}
-    button[data-testid="stDeployButton"] {display: none !important;}
-    footer, [data-testid="stStatusWidget"], div[class*="hosted"], div:contains("Streamlit") {display: none !important; visibility: hidden !important; height: 0 !important;}
-
-    /* OCULTAR AVATAR EN CHAT_INPUT (CUADRADO CON CARA - FIX #12132 MÓVIL) */
-    [data-testid="stChatInput"] img, [data-testid="stChatInput"] > div > div > img, [data-testid="stChatInput"] [alt*="avatar"], img[alt*="avatar"] {display: none !important; visibility: hidden !important; width: 0 !important; height: 0 !important; opacity: 0 !important;}
-
-    /* OCULTAR AVATARES EN MENSAJES (POR SI ACASO) */
-    [data-testid="stChatMessage"] img[src*="avatar"], [data-testid="stAvatar"] {display: none !important; visibility: hidden !important; width: 0 !important; height: 0 !important;}
+    /* OCULTAR CORONA ROJA Y HOSTED FOOTER (FIX 2025) */
+    .stDeployButton, button[data-testid="stDeployButton"], footer, [data-testid="stStatusWidget"], div[class*="hosted"] {display: none !important;}
 
     /* LAYOUT CENTRADO RESPONSIVO (SIN DESCUADRADO) */
-    .main .block-container {max-width: 800px !important; margin: 0 auto !important; padding: 1rem !important; width: auto !important;}
-    @media (max-width: 768px) {
-        .main .block-container {width: 95% !important; padding: 0.5rem !important;}
-        [data-testid="stChatInput"] {max-width: 100% !important; margin: 0 auto !important;}
-    }
+    .main .block-container {max-width: 800px !important; margin: 0 auto !important; padding: 1rem !important;}
+    @media (max-width: 768px) {.main .block-container {width: 95% !important; padding: 0.5rem !important;}}
     .stApp {background-color: #0e1117 !important;}
 
-    /* ESTILOS MENSAJES (NARANJA NUTRISCO, ALINEADOS) */
-    [data-testid="stChatMessage"] {padding: 0 !important; gap: 0 !important;}
-    .user-message {background: #262730 !important; color: white !important; border-radius: 18px !important; padding: 14px 20px !important; margin: 16px 0 !important; max-width: 80% !important; margin-left: auto !important; box-shadow: 0 2px 10px rgba(0,0,0,0.4) !important;}
-    .assistant-message {background: linear-gradient(135deg, #ea580c, #f97316) !important; color: white !important; border-radius: 18px !important; padding: 14px 20px !important; margin: 16px 0 !important; max-width: 80% !important; margin-right: auto !important; box-shadow: 0 4px 15px rgba(249,115,22,0.5) !important;}
-    @media (max-width: 768px) {.user-message, .assistant-message {max-width: 95% !important; padding: 12px 16px !important; margin: 12px 0 !important;}}
-    .header-box {background: linear-gradient(90deg, #ea580c, #c2410c) !important; padding: 2rem !important; border-radius: 20px !important; text-align: center !important; color: white !important; box-shadow: 0 10px 30px rgba(234,88,12,0.4) !important; margin: 0 auto !important;}
+    /* ESTILOS HEADER Y FOOTER */
+    .header-box {background: linear-gradient(90deg, #ea580c, #c2410c) !important; padding: 2rem !important; border-radius: 20px !important; text-align: center !important; color: white !important; box-shadow: 0 10px 30px rgba(234,88,12,0.4) !important;}
     @media (max-width: 768px) {.header-box {padding: 1.5rem !important;}}
-    .belén-box {background: #dc2626 !important; color: white !important; padding: 1.3rem !important; border-radius: 15px !important; text-align: center !important; font-weight: bold !important; margin: 2rem auto !important; font-size: 1.15rem !important; box-shadow: 0 4px 15px rgba(220,38,38,0.4) !important;}
-    @media (max-width: 768px) {.belén-box {font-size: 1rem !important; padding: 1rem !important;}}
-    .footer {text-align: center !important; margin-top: 4rem !important; color: #64748b !important; font-size: 0.95rem !important; padding: 2rem 0 !important; position: relative !important; z-index: 10 !important;}
-    .typing {font-style: italic !important; color: #94a3b8 !important; margin: 15px 0 !important; text-align: left !important;}
-    @keyframes blink {0%, 100% {opacity: 1;} 50% {opacity: 0;}}
+    .belén-box {background: #dc2626 !important; color: white !important; padding: 1.3rem !important; border-radius: 15px !important; text-align: center !important; font-weight: bold !important; margin: 2rem auto !important;}
+    .footer {text-align: center !important; margin-top: 4rem !important; color: #64748b !important; font-size: 0.95rem !important; padding: 2rem 0 !important;}
 </style>
-
-<!-- JS DINÁMICO: BORRA AVATAR INPUT Y CORONA CADA 500MS (FIX MÓVIL 2025) -->
-<script>
-    setInterval(() => {
-        const elements = document.querySelectorAll('[data-testid="stChatInput"] img, .stDeployButton, button[data-testid="stDeployButton"], footer, [data-testid="stStatusWidget"], img[alt*="avatar"], div:contains("Streamlit"), div:contains("Hosted")');
-        elements.forEach(el => { if (el) { el.style.display = 'none'; el.remove(); } });
-    }, 500);
-</script>
 """, unsafe_allow_html=True)
 
-# ==================== CLAVE OPENAI ====================
 API_KEY = os.getenv("OPENAI_API_KEY")
 if not API_KEY:
     st.error("⚠️ Falta la clave OPENAI_API_KEY en Secrets o .env")
@@ -76,50 +50,48 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ==================== INICIALIZAR CHAT ====================
+# ==================== INICIALIZAR CHAT CON STREAMLIT-CHAT (SIN AVATARES) ====================
 if "messages" not in st.session_state:
-    st.session_state.messages = [{
-        "role": "assistant",
-        "content": "¡Hola! 👋 Soy parte del equipo de **Atención a Personas** de Nutrisco.\n\nPuedes preguntarme cualquier cosa: licencias, beneficios, BUK, finiquitos, vestimenta, bono Fisherman, etc.\n\n¡Estoy aquí para ayudarte!"
-    }]
+    st.session_state.messages = [{"role": "assistant", "content": "¡Hola! 👋 Soy parte del equipo de **Atención a Personas** de Nutrisco.\n\nPuedes preguntarme cualquier cosa: licencias, beneficios, BUK, finiquitos, vestimenta, bono Fisherman, etc.\n\n¡Estoy aquí para ayudarte!"}]
 
-# ==================== MOSTRAR HISTORIAL ====================
-for msg in st.session_state.messages:
-    with st.chat_message(msg["role"], avatar=None):
-        st.markdown(f'<div class="{ "user-message" if msg["role"] == "user" else "assistant-message" }">{msg["content"]}</div>', unsafe_allow_html=True)
+# ==================== MOSTRAR HISTORIAL CON MESSAGE (SIN AVATARES) ====================
+for i, msg in enumerate(st.session_state.messages):
+    if msg["role"] == "user":
+        message(msg["content"], is_user=True, key=f"user_{i}")  # Usuario a la derecha, sin avatar
+    else:
+        message(msg["content"], key=f"assistant_{i}")  # Asistente a la izquierda, sin avatar
 
-# ==================== INPUT Y PROCESAMIENTO ====================
-if pregunta := st.chat_input("Escribe tu consulta aquí..."):
+# ==================== INPUT PERSONALIZADO CON st.text_input (SIN AVATAR EN INPUT) ====================
+pregunta = st.text_input("Escribe tu consulta aquí...", key="user_input", placeholder="Escribe tu consulta aquí...")
+if pregunta:
     st.session_state.messages.append({"role": "user", "content": pregunta})
-    with st.chat_message("user", avatar=None):
-        st.markdown(f'<div class="user-message">{pregunta}</div>', unsafe_allow_html=True)
+    message(pregunta, is_user=True)  # Muestra usuario sin avatar
 
-    with st.chat_message("assistant", avatar=None):
-        placeholder = st.empty()
-        placeholder.markdown('<div class="typing">Escribiendo<span style="animation: blink 1s infinite;">...</span></div>', unsafe_allow_html=True)
+    # Typing simulado
+    with st.spinner("Escribiendo..."):
         time.sleep(1.3)
-        placeholder.empty()
 
-        try:
-            response = requests.post(
-                "https://api.openai.com/v1/chat/completions",
-                headers={"Authorization": f"Bearer {API_KEY}"},
-                json={
-                    "model": "gpt-4o-mini",
-                    "temperature": 0.7,
-                    "max_tokens": 600,
-                    "messages": [
-                        {"role": "system", "content": "Eres una persona real del equipo de RR.HH. de Nutrisco en Chile. Hablas español chileno, cercano, profesional y amable. Nunca digas que eres IA. Si el tema es delicado (acoso, conflicto, denuncia), deriva con mucho tacto a Belén Bastías."},
-                        {"role": "user", "content": pregunta}
-                    ]
-                },
-                timeout=30
-            )
-            respuesta = response.json()["choices"][0]["message"]["content"]
-        except Exception as e:
-            respuesta = "Uy, justo ahora tengo un problema de conexión. Mejor escribe a **belen.bastias@nutrisco.com** o llama al interno **7219**. ¡Perdona las molestias!"
+    # Llamada a OpenAI
+    try:
+        response = requests.post(
+            "https://api.openai.com/v1/chat/completions",
+            headers={"Authorization": f"Bearer {API_KEY}"},
+            json={
+                "model": "gpt-4o-mini",
+                "temperature": 0.7,
+                "max_tokens": 600,
+                "messages": [
+                    {"role": "system", "content": "Eres una persona real del equipo de RR.HH. de Nutrisco en Chile. Hablas español chileno, cercano, profesional y amable. Nunca digas que eres IA. Si el tema es delicado (acoso, conflicto, denuncia), deriva con mucho tacto a Belén Bastías."},
+                    {"role": "user", "content": pregunta}
+                ]
+            },
+            timeout=30
+        )
+        respuesta = response.json()["choices"][0]["message"]["content"]
+    except Exception as e:
+        respuesta = "Uy, justo ahora tengo un problema de conexión. Mejor escribe a **belen.bastias@nutrisco.com** o llama al interno **7219**. ¡Perdona las molestias!"
 
-        st.markdown(f'<div class="assistant-message">{respuesta}</div>', unsafe_allow_html=True)
+    message(respuesta, key="assistant_response")  # Muestra respuesta sin avatar
     st.session_state.messages.append({"role": "assistant", "content": respuesta})
 
     # Temas sensibles
@@ -151,9 +123,9 @@ if pregunta := st.chat_input("Escribe tu consulta aquí..."):
     except:
         pass
 
-    st.rerun()
+    st.rerun()  # Refresca para limpiar input
 
-# ==================== FOOTER EXACTO COMO TÚ QUIERES ====================
+# ==================== FOOTER ====================
 st.markdown("""
 <div class="footer">
     <br>
