@@ -322,8 +322,8 @@ if pregunta := st.chat_input("Escribe tu consulta aquí..."):
 # ==================== FOOTER CORPORATIVO ====================
 st.markdown("""
 <div class="footer">
-    Desarrollado por Luis Reyes © 2025<br>
-    Inteligencia Artificial al servicio de las personas – Nutrisco
+    <br>
+    Inteligencia Artificial al servicio de las personas – Nutrisco  © 2025
 </div>
 """, unsafe_allow_html=True)
 
