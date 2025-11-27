@@ -1,4 +1,4 @@
-# pages/4_🤖_Chatbot Colaboradores.py → VERSIÓN FINAL 2025: SIN FOTO/CORONA, SIMÉTRICO DESKTOP/MÓVIL (FIX V1.40)
+# pages/4_🤖_Chatbot Colaboradores.py → VERSIÓN FINAL 2025: SIN FOTO/CORONA, SIMÉTRICO DESKTOP/MÓVIL (FIX V1.41)
 import streamlit as st
 import pandas as pd
 import requests
@@ -16,10 +16,10 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# ==================== CSS DEFINITIVO 2025 (OCULTAR CORONA, FOTO, ALINEAR MENSAJES) ====================
+# ==================== CSS + JS AGRESIVO PARA MÓVIL (OCULTAR TODO) ====================
 st.markdown("""
 <style>
-    /* OCULTAR CORONA ROJA (DEPLOY BUTTON) - MÁS ROBUSTO */
+    /* OCULTAR CORONA Y AVATAR CON CSS */
     .stAppDeployButton, button[data-testid="stDeployButton"], .stDeployButton {
         display: none !important;
         visibility: hidden !important;
@@ -27,6 +27,7 @@ st.markdown("""
         width: 0 !important;
         z-index: -9999 !important;
         position: absolute !important;
+        pointer-events: none !important;
     }
 
     /* OCULTAR AVATAR EN INPUT Y MENSAJES */
@@ -44,6 +45,7 @@ st.markdown("""
         opacity: 0 !important;
         margin: 0 !important;
         padding: 0 !important;
+        pointer-events: none !important;
     }
 
     /* OCULTAR FOOTER STREAMLIT Y LOGOS */
@@ -51,6 +53,8 @@ st.markdown("""
         display: none !important;
         visibility: hidden !important;
         height: 0 !important;
+        width: 0 !important;
+        z-index: -9999 !important;
     }
 
     /* LAYOUT CENTRADO RESPONSIVO */
@@ -161,36 +165,62 @@ st.markdown("""
     }
 </style>
 
-<!-- JS DINÁMICO: BORRA ELEMENTOS RESIDUALES CADA 300MS -->
+<!-- JS AGRESIVO: BORRA ELEMENTOS AL CARGAR Y CADA 300MS -->
 <script>
-    setInterval(() => {
-        // Seleccionamos todos los elementos problemáticos
-        const elements = document.querySelectorAll(
-            'button[data-testid="stDeployButton"], .stDeployButton, .stAppDeployButton, ' +
-            '[data-testid="stChatInput"] img, [data-testid="stChatInput"] svg, ' +
-            '[data-testid="stAvatar"], footer, [data-testid="stStatusWidget"], ' +
-            'div:contains("Streamlit"), div:contains("Hosted"), img[alt*="avatar"], ' +
+    // Esperar a que el DOM esté listo
+    window.addEventListener('load', function() {
+        // Ocultar elementos inmediatamente al cargar
+        hideElements();
+
+        // Intentar borrar cada 300ms
+        setInterval(hideElements, 300);
+    });
+
+    function hideElements() {
+        const selectors = [
+            'button[data-testid="stDeployButton"]',
+            '.stDeployButton',
+            '.stAppDeployButton',
+            '[data-testid="stChatInput"] img',
+            '[data-testid="stChatInput"] svg',
+            '[data-testid="stChatInput"] [alt*="avatar"]',
+            '[data-testid="stAvatar"]',
+            'footer',
+            '[data-testid="stStatusWidget"]',
+            'div[class*="hosted"]',
+            'div:contains("Streamlit")',
             'a[href*="github.com"]'
-        );
-        elements.forEach(el => {
-            if (el && el.parentNode) {
-                el.style.display = 'none';
-                el.style.visibility = 'hidden';
-                el.style.height = '0';
-                el.style.width = '0';
-                el.style.opacity = '0';
-                el.style.zIndex = '-9999';
-                el.style.position = 'absolute';
-                // Intentamos removerlo del DOM
-                try {
-                    el.remove();
-                } catch (e) {
-                    // Si no se puede remover, al menos lo ocultamos
-                    el.setAttribute('style', 'display:none !important; visibility:hidden !important;');
+        ];
+
+        selectors.forEach(selector => {
+            const elements = document.querySelectorAll(selector);
+            elements.forEach(el => {
+                if (el && el.parentNode) {
+                    // Ocultamos primero
+                    el.style.display = 'none';
+                    el.style.visibility = 'hidden';
+                    el.style.height = '0';
+                    el.style.width = '0';
+                    el.style.opacity = '0';
+                    el.style.zIndex = '-9999';
+                    el.style.position = 'absolute';
+
+                    // Intentamos removerlo del DOM
+                    try {
+                        el.remove();
+                    } catch (e) {
+                        // Si no se puede remover, al menos lo ocultamos
+                        el.setAttribute('style', 'display:none !important; visibility:hidden !important;');
+                    }
                 }
-            }
+            });
         });
-    }, 300);
+    }
+
+    // Forzar limpieza incluso si se carga tarde
+    setTimeout(hideElements, 1000);
+    setTimeout(hideElements, 2000);
+    setTimeout(hideElements, 5000);
 </script>
 """, unsafe_allow_html=True)
 
