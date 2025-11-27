@@ -192,6 +192,5 @@ st.markdown("""
 <div class="footer">
     <br>
     Inteligencia Artificial al servicio de las personas – Nutrisco © 2025<br>
-    Desarrollado por Alberto Reyes
-</div>
+   </div>
 """, unsafe_allow_html=True)
