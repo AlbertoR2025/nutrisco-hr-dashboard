@@ -1,6 +1,8 @@
+# pages/4_🤖_Chatbot Colaboradores.py → VERSIÓN FINAL 2025: MODERNO, FUNCIONAL Y RESPONSIIVO
 import streamlit as st
 import requests
 import os
+from datetime import datetime
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -12,49 +14,31 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# ==================== CSS NUCLEAR - ELIMINACIÓN COMPLETA ====================
+# ========== CSS MODERNO Y LIMPIO + OCULTAR CORONA Y AVATAR ==========
 st.markdown("""
 <style>
-/* === ELIMINACIÓN TOTAL DE ELEMENTOS STREAMLIT === */
-header, footer,
-[data-testid="stToolbar"],
-[data-testid="stDeployButton"],
-.stDeployButton,
-[data-testid="stStatusWidget"],
-[data-testid="stDecoration"],
-button[title*="Deploy"],
-button[title*="View"],
-a[href*="github"],
-a[href*="streamlit"],
-[data-testid="stChatMessageAvatar"],
-[data-testid="stAvatar"],
-.stChatMessage img,
-.stChatMessage svg,
-[data-testid="stChatMessage"] img,
-[data-testid="stChatMessage"] svg {
+/* Ocultar elementos Streamlit agresivamente */
+header, footer, [data-testid="stToolbar"], [data-testid="stDeployButton"],
+.stDeployButton, [data-testid="stStatusWidget"], [data-testid="stDecoration"],
+button[title*="Deploy"], button[title*="View"], a[href*="github"], a[href*="streamlit"] {
     display: none !important;
     visibility: hidden !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    width: 0px !important;
-    height: 0px !important;
-    min-width: 0px !important;
-    min-height: 0px !important;
+    position: absolute !important;
+    left: -9999px !important;
 }
 
-/* === FONDO === */
+/* Fondo limpio */
 .stApp {
     background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
-    min-height: 100vh;
 }
 
 .block-container {
     max-width: 800px !important;
     margin: 0 auto !important;
-    padding: 2rem 1rem 140px 1rem !important;
+    padding: 2rem 1rem 110px 1rem !important;
 }
 
-/* === HEADER === */
+/* Header moderno y centrado */
 .header {
     background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
     padding: 2.8rem 2rem;
@@ -63,14 +47,13 @@ a[href*="streamlit"],
     color: white;
     margin-bottom: 2.5rem;
     box-shadow: 0 20px 50px rgba(234, 88, 12, 0.35);
-    position: relative;
-    z-index: 1;
 }
 
 .header h1 {
     font-size: 2.2rem;
     font-weight: 700;
     margin: 0;
+    letter-spacing: -0.02em;
 }
 
 .header h2 {
@@ -86,7 +69,7 @@ a[href*="streamlit"],
     font-size: 1rem;
 }
 
-/* === BURBUJAS MODERNAS === */
+/* Burbujas estilo WhatsApp/iOS modernas */
 .user {
     background: linear-gradient(135deg, #3b82f6, #2563eb);
     color: white;
@@ -97,6 +80,7 @@ a[href*="streamlit"],
     box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
     font-size: 0.95rem;
     line-height: 1.5;
+    word-wrap: break-word;
 }
 
 .bot {
@@ -109,6 +93,7 @@ a[href*="streamlit"],
     box-shadow: 0 2px 8px rgba(234, 88, 12, 0.3);
     font-size: 0.95rem;
     line-height: 1.5;
+    word-wrap: break-word;
 }
 
 .footer {
@@ -119,95 +104,97 @@ a[href*="streamlit"],
     opacity: 0.7;
 }
 
-/* === INPUT PERSONALIZADO - NO USAR st.chat_input === */
-.custom-input-container {
+/* Chat input fijo y limpio */
+[data-testid="stChatInput"] {
     position: fixed !important;
     bottom: 0 !important;
     left: 0 !important;
     right: 0 !important;
-    width: 100% !important;
-    background: rgba(15, 23, 42, 0.98) !important;
-    padding: 16px 12px 24px 12px !important;
-    border-top: 1px solid rgba(71, 85, 105, 0.4) !important;
-    backdrop-filter: blur(20px) !important;
-    z-index: 2147483647 !important;
-    box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.4) !important;
+    background: rgba(15, 23, 42, 0.95) !important;
+    padding: 12px !important;
+    border-top: 1px solid rgba(71, 85, 105, 0.3) !important;
+    backdrop-filter: blur(12px) !important;
+    z-index: 999999 !important;
 }
 
-.custom-input-wrapper {
+[data-testid="stChatInput"] > div {
     max-width: 800px !important;
     margin: 0 auto !important;
     display: flex !important;
-    gap: 12px !important;
+    gap: 10px !important;
     align-items: center !important;
-    position: relative !important;
 }
 
-.custom-text-input {
-    flex: 1 !important;
-    border-radius: 26px !important;
-    border: 2px solid #334155 !important;
+/* Input de texto moderno */
+[data-testid="stChatInput"] textarea {
+    border-radius: 24px !important;
+    border: 1.5px solid #334155 !important;
     background: #1e293b !important;
     color: #f1f5f9 !important;
-    font-size: 1rem !important;
-    padding: 16px 70px 16px 20px !important;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2) !important;
+    font-size: 0.95rem !important;
+    padding: 12px 60px 12px 18px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
     resize: none !important;
     transition: all 0.2s ease !important;
-    outline: none !important;
-    font-family: inherit !important;
 }
 
-.custom-text-input::placeholder {
+[data-testid="stChatInput"] textarea::placeholder {
     color: #64748b !important;
 }
 
-.custom-text-input:focus {
+[data-testid="stChatInput"] textarea:focus {
     border-color: #ea580c !important;
-    box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.2), 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+    box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.15), 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+    outline: none !important;
 }
 
-.custom-send-button {
+/* Botón de envío moderno y visible */
+[data-testid="stChatInput"] button {
     background: linear-gradient(135deg, #ea580c, #dc2626) !important;
     border-radius: 50% !important;
-    width: 52px !important;
-    height: 52px !important;
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 48px !important;
+    min-height: 48px !important;
+    padding: 0 !important;
+    margin: 0 !important;
     border: none !important;
-    box-shadow: 0 6px 16px rgba(234, 88, 12, 0.45) !important;
+    box-shadow: 0 4px 12px rgba(234, 88, 12, 0.4) !important;
     transition: all 0.2s ease !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     position: absolute !important;
-    right: 8px !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-    z-index: 2147483647 !important;
-    cursor: pointer !important;
+    right: 6px !important;
+    bottom: 6px !important;
+    z-index: 10 !important;
+}
+
+[data-testid="stChatInput"] button svg {
+    width: 20px !important;
+    height: 20px !important;
     color: white !important;
-    font-size: 18px !important;
-    font-weight: bold !important;
 }
 
-.custom-send-button:hover {
+[data-testid="stChatInput"] button:hover {
     background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
-    transform: translateY(-50%) scale(1.08) !important;
-    box-shadow: 0 8px 20px rgba(234, 88, 12, 0.55) !important;
+    transform: scale(1.05) !important;
+    box-shadow: 0 6px 16px rgba(234, 88, 12, 0.5) !important;
 }
 
-.custom-send-button:active {
-    transform: translateY(-50%) scale(0.96) !important;
+[data-testid="stChatInput"] button:active {
+    transform: scale(0.95) !important;
 }
 
-/* === RESPONSIVE MEJORADO === */
+/* Responsive móvil */
 @media (max-width: 768px) {
     .block-container {
-        padding: 1rem 0.8rem 150px 0.8rem !important;
+        padding: 1rem 0.8rem 110px 0.8rem !important;
     }
     
     .header {
         padding: 2rem 1.5rem;
-        margin-bottom: 2rem;
+        border-radius: 20px;
     }
     
     .header h1 {
@@ -222,112 +209,87 @@ a[href*="streamlit"],
         max-width: 85%;
         padding: 11px 16px;
         font-size: 0.9rem;
-        margin: 8px 0 8px auto;
     }
     
-    .bot {
-        margin: 8px auto 8px 0;
+    [data-testid="stChatInput"] textarea {
+        font-size: 0.9rem !important;
+        padding: 11px 55px 11px 16px !important;
     }
     
-    .custom-input-container {
-        padding: 14px 10px 20px 10px !important;
+    [data-testid="stChatInput"] button {
+        width: 42px !important;
+        height: 42px !important;
+        min-width: 42px !important;
+        min-height: 42px !important;
     }
-    
-    .custom-text-input {
-        font-size: 0.92rem !important;
-        padding: 14px 60px 14px 16px !important;
-    }
-    
-    .custom-send-button {
-        width: 46px !important;
-        height: 46px !important;
-        right: 6px !important;
-        font-size: 16px !important;
-    }
-}
-
-/* === ELIMINAR ESPACIOS DE AVATARES === */
-[data-testid="stChatMessage"] > div {
-    gap: 0px !important;
-    padding-left: 0px !important;
-    padding-right: 0px !important;
-}
-
-[data-testid="stChatMessage"] > div > div:first-child {
-    display: none !important;
-    width: 0px !important;
-    min-width: 0px !important;
 }
 </style>
 
-<!-- JAVASCRIPT MÁS AGRESIVO -->
 <script>
-function eliminarElementosNoDeseados() {
-    // Eliminar por selectores
-    const selectores = [
-        'header', 'footer',
-        '[data-testid="stToolbar"]',
-        '[data-testid="stDeployButton"]',
-        '.stDeployButton',
-        '[data-testid="stStatusWidget"]',
-        '[data-testid="stDecoration"]',
-        'button[title*="Deploy"]',
-        'button[title*="View"]',
-        'a[href*="github"]',
-        'a[href*="streamlit"]',
-        '[data-testid="stChatMessageAvatar"]',
-        '[data-testid="stAvatar"]',
-        '.stChatMessage img',
-        '.stChatMessage svg',
-        '[data-testid="stChatMessage"] img',
-        '[data-testid="stChatMessage"] svg'
-    ];
+// Eliminar elementos Streamlit persistentemente
+(function() {
+    function removeStreamlitElements() {
+        const selectors = [
+            'header', 'footer', '[data-testid="stToolbar"]',
+            '[data-testid="stDeployButton"]', '.stDeployButton',
+            '[data-testid="stStatusWidget"]', '[data-testid="stDecoration"]',
+            'button[title*="Deploy"]', 'button[title*="View"]',
+            'a[href*="github"]', 'a[href*="streamlit"]'
+        ];
+        selectors.forEach(sel => {
+            document.querySelectorAll(sel).forEach(el => {
+                el.remove();
+            });
+        });
+    }
     
-    selectores.forEach(selector => {
-        document.querySelectorAll(selector).forEach(el => {
-            el.remove();
+    // Ocultar corona y avatar específicos
+    function hideCrownAndAvatar() {
+        // Oculta la corona roja
+        const crown = document.querySelector('.stAppDeployButton') || 
+                     document.querySelector('[data-testid="stDeployButton"]') || 
+                     document.querySelector('.stDeployButton');
+        if (crown) {
+            crown.style.display = 'none';
+            crown.style.visibility = 'hidden';
+        }
+
+        // Oculta avatar en input
+        const avatarInInput = document.querySelector('[data-testid="stChatInput"] > div > div > div > img') ||
+                             document.querySelector('[data-testid="stChatInput"] > div > div > div > svg') ||
+                             document.querySelector('[data-testid="stChatInput"] > div > div > div > [alt*="avatar"]');
+        if (avatarInInput) {
+            avatarInInput.style.display = 'none';
+            avatarInInput.style.visibility = 'hidden';
+        }
+
+        // Oculta avatares en mensajes
+        const messageAvatars = document.querySelectorAll('[data-testid="stChatMessage"] > div > img, [data-testid="stChatMessage"] > div > svg, [data-testid="stChatMessage"] > div > [data-testid="stAvatar"]');
+        messageAvatars.forEach(el => {
             el.style.display = 'none';
             el.style.visibility = 'hidden';
         });
-    });
-    
-    // Eliminar contenedores de avatares
-    document.querySelectorAll('[data-testid="stChatMessage"] > div > div:first-child').forEach(el => {
-        el.remove();
-        el.style.display = 'none';
-    });
-    
-    // Eliminar cualquier elemento en esquinas
-    document.querySelectorAll('*').forEach(el => {
-        const rect = el.getBoundingClientRect();
-        if ((rect.top === 0 && rect.right <= 100) || (rect.top === 0 && rect.left >= window.innerWidth - 100)) {
-            el.remove();
-        }
-    });
-}
+    }
 
-// Ejecutar inmediatamente y persistentemente
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', eliminarElementosNoDeseados);
-} else {
-    eliminarElementosNoDeseados();
-}
+    // Ejecutar al cargar
+    document.addEventListener('DOMContentLoaded', function() {
+        removeStreamlitElements();
+        hideCrownAndAvatar();
+    });
 
-// Ejecutar múltiples veces
-setTimeout(eliminarElementosNoDeseados, 100);
-setTimeout(eliminarElementosNoDeseados, 500);
-setTimeout(eliminarElementosNoDeseados, 1000);
-
-// Ejecutar cada 2 segundos por 10 segundos
-let count = 0;
-const interval = setInterval(() => {
-    eliminarElementosNoDeseados();
-    count++;
-    if (count > 5) clearInterval(interval);
-}, 2000);
+    // Reintentar cada segundo durante 10 segundos
+    let attempts = 0;
+    setInterval(function() {
+        removeStreamlitElements();
+        hideCrownAndAvatar();
+        attempts++;
+        if (attempts > 10) clearInterval(this);
+    }, 1000);
+})();
 </script>
 """, unsafe_allow_html=True)
 
+# ========== LÓGICA DEL CHATBOT ==========
 API_KEY = os.getenv("OPENAI_API_KEY")
 if not API_KEY:
     st.error("⚠️ Falta configurar OPENAI_API_KEY")
@@ -357,60 +319,13 @@ for msg in st.session_state.messages:
     else:
         st.markdown(f'<div class="bot">{msg["content"]}</div>', unsafe_allow_html=True)
 
-# ==================== INPUT PERSONALIZADO - NO USAR st.chat_input ====================
-st.markdown("""
-<div class="custom-input-container">
-    <div class="custom-input-wrapper">
-        <input type="text" class="custom-text-input" id="customChatInput" placeholder="Escribe tu consulta aquí..." />
-        <button class="custom-send-button" onclick="sendMessage()">➤</button>
-    </div>
-</div>
-
-<script>
-function sendMessage() {
-    const input = document.getElementById('customChatInput');
-    const message = input.value.trim();
+# Input con Enter automático
+if prompt := st.chat_input("Escribe tu consulta aquí..."):
+    st.session_state.messages.append({"role": "user", "content": prompt})
     
-    if (message) {
-        // Usar query parameters para enviar el mensaje
-        const url = new URL(window.location);
-        url.searchParams.set('user_message', message);
-        window.history.pushState({}, '', url);
-        
-        // Recargar la página
-        window.location.reload();
-    }
-}
-
-// Enviar con Enter
-document.getElementById('customChatInput').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        sendMessage();
-    }
-});
-
-// Focus automático
-setTimeout(() => {
-    const input = document.getElementById('customChatInput');
-    if (input) input.focus();
-}, 1000);
-</script>
-""", unsafe_allow_html=True)
-
-# ==================== PROCESAR MENSAJES ====================
-query_params = st.experimental_get_query_params()
-user_message = query_params.get("user_message", [None])[0]
-
-if user_message and user_message != st.session_state.get("last_processed_message", ""):
-    st.session_state.last_processed_message = user_message
-    
-    # Agregar mensaje del usuario
-    st.session_state.messages.append({"role": "user", "content": user_message})
-    
-    # Obtener respuesta
     try:
-        response = requests.post(
-            "https://api.openai.com/v1/chat/completions",
+        resp = requests.post(
+            "https://api.openai.com/v1/chat/completions  ",
             headers={"Authorization": f"Bearer {API_KEY}"},
             json={
                 "model": "gpt-4o-mini",
@@ -424,12 +339,12 @@ if user_message and user_message != st.session_state.get("last_processed_message
                             "cercano y profesional. Para temas sensibles deriva a Belén Bastías."
                         ),
                     },
-                    {"role": "user", "content": user_message},
+                    {"role": "user", "content": prompt},
                 ],
             },
             timeout=30,
         )
-        answer = response.json()["choices"][0]["message"]["content"]
+        answer = resp.json()["choices"][0]["message"]["content"]
     except Exception:
         answer = (
             "⚠️ Problema de conexión. Contacta a Belén Bastías: "
@@ -437,11 +352,6 @@ if user_message and user_message != st.session_state.get("last_processed_message
         )
     
     st.session_state.messages.append({"role": "assistant", "content": answer})
-    
-    # Limpiar parámetros
-    st.experimental_set_query_params()
-    
-    # Recargar para mostrar nuevos mensajes
     st.rerun()
 
 st.markdown(
