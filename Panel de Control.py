@@ -119,7 +119,8 @@ except Exception as e:
 
 # ==================== FOOTER ====================
 st.markdown("""
-<div style="text-align:center; padding:2rem 0 1rem 0; color:#94a3b8; font-size:0.95rem;">
-    Inteligencia Artificial al servicio de las personas – Nutrisco
+<div class="footer">
+    <br>
+    Inteligencia Artificial al servicio de las personas – Nutrisco  © 2025
 </div>
 """, unsafe_allow_html=True)
