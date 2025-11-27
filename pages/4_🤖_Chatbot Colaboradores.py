@@ -140,7 +140,6 @@ if pregunta := st.chat_input("Escribe tu consulta aquí..."):
     # 7. Recargar suavemente (funciona en todas las versiones)
     st.rerun()   # ← ESTA ES LA LÍNEA CORRECTA
 
-# Footer
 # Footer limpio y corporativo (solo Nutrisco)
 st.markdown("""
 <div class="footer">
