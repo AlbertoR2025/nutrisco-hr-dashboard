@@ -1,4 +1,4 @@
-# pages/4_🤖_Chatbot Colaboradores.py → 100% LIMPIO – SIN FOTO – SIN CORONA – SIN NADA (FUNCIONA 2025)
+# pages/4_🤖_Chatbot Colaboradores.py → 100% LIMPIO Y SIMÉTRICO – FUNCIONA 27 NOV 2025
 import streamlit as st
 import pandas as pd
 import requests
@@ -9,25 +9,26 @@ load_dotenv()
 
 st.set_page_config(page_title="Chatbot Nutrisco", page_icon="💬", layout="centered")
 
-# OCULTAR TODO LO DE STREAMLIT
+# CSS QUE SÍ ELIMINA FOTO Y CORONA EN 2025
 st.markdown("""
 <style>
+    /* OCULTA TODO LO DE STREAMLIT */
     header, footer, [data-testid="stToolbar"], [data-testid="stDeployButton"], 
     .stDeployButton, [data-testid="stStatusWidget"], .stAppDeployButton {display: none !important;}
-    .stApp {background: #0e1117;}
+    
+    /* OCULTA FOTO Y CORONA EN EL INPUT */
+    [data-testid="stChatInput"] > div > div > div:first-child {display: none !important;}
+    [data-testid="stChatInput"] img, [data-testid="stChatInput"] svg {display: none !important;}
+    
+    /* SIMETRÍA PERFECTA */
     .block-container {max-width: 800px; padding: 1rem;}
     @media (max-width: 768px) {.block-container {padding: 0.5rem; width: 95% !important;}}
+    .stApp {background: #0e1117;}
     
-    .header {background: linear-gradient(90deg, #ea580c, #c2410c); padding: 2.5rem; border-radius: 20px; text-align: center; color: white; box-shadow: 0 10px 30px rgba(234,88,12,0.4);}
-    .user {background: #262730; color: white; border-radius: 18px; padding: 14px 20px; margin: 16px 5% 16px auto; max-width: 80%; box-shadow: 0 2px 10px rgba(0,0,0,0.4);}
-    .assistant {background: linear-gradient(135deg, #ea580c, #f97316); color: white; border-radius: 18px; padding: 14px 20px; margin: 16px auto 16px 5%; max-width: 80%; box-shadow: 0 4px 15px rgba(249,115,22,0.5);}
-    .footer {text-align: center; margin-top: 4rem; color: #64748b; font-size: 0.95rem; padding-bottom: 100px;}
-    
-    /* INPUT PERSONALIZADO FIJO ABAJO */
-    .chat-container {padding-bottom: 100px;}
-    .custom-input {position: fixed; bottom: 0; left: 0; width: 100%; background: #0e1117; padding: 15px; box-sizing: border-box; z-index: 1000;}
-    .custom-input input {width: 100%; padding: 16px 20px; border-radius: 30px; border: none; background: #1f2937; color: white; font-size: 1.1rem;}
-    .custom-input input:focus {outline: none; background: #374151;}
+    .header {background: linear-gradient(90deg, #ea580c, #c2410c); padding: 2.5rem; border-radius: 20px; text-align: center; color: white;}
+    .user {background: #262730; color: white; border-radius: 18px; padding: 14px 20px; margin: 12px 8% 12px auto; max-width: 75%;}
+    .assistant {background: linear-gradient(135deg, #ea580c, #f97316); color: white; border-radius: 18px; padding: 14px 20px; margin: 12px auto 12px 8%; max-width: 75%;}
+    .footer {text-align: center; margin-top: 3rem; color: #64748b; font-size: 0.95rem; padding-bottom: 80px;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -41,41 +42,16 @@ st.markdown('<div class="header"><h1>Chatbot Colaboradores</h1><h2>Nutrisco – 
 if "messages" not in st.session_state:
     st.session_state.messages = [{"role": "assistant", "content": "¡Hola! Soy parte del equipo de **Atención a Personas** de Nutrisco.\n\nPuedes preguntarme cualquier cosa: licencias, beneficios, BUK, finiquitos, vestimenta, bono Fisherman, etc.\n\n¡Estoy aquí para ayudarte!"}]
 
-st.markdown('<div class="chat-container">', unsafe_allow_html=True)
-
 for msg in st.session_state.messages:
     if msg["role"] == "user":
         st.markdown(f'<div class="user">{msg["content"]}</div>', unsafe_allow_html=True)
     else:
         st.markdown(f'<div class="assistant">{msg["content"]}</div>', unsafe_allow_html=True)
 
-st.markdown('</div>', unsafe_allow_html=True)
-
-# INPUT HTML PERSONALIZADO (SIN FOTO NI CORONA)
-st.markdown("""
-<div class="custom-input">
-    <input type="text" id="user_input" placeholder="Escribe tu consulta aquí..." autofocus>
-</div>
-<script>
-    const input = document.getElementById('user_input');
-    input.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter' && input.value.trim()) {
-            const value = input.value.trim();
-            const url = new URL(window.location);
-            url.searchParams.set('q', value);
-            window.location = url;
-        }
-    });
-</script>
-""", unsafe_allow_html=True)
-
-# PROCESAR PREGUNTA
-query = st.experimental_get_query_params().get("q", [None])[0]
-if query:
-    pregunta = query if isinstance(query, str) else query[0]
+if pregunta := st.chat_input("Escribe tu consulta aquí..."):
     st.session_state.messages.append({"role": "user", "content": pregunta})
     st.markdown(f'<div class="user">{pregunta}</div>', unsafe_allow_html=True)
-
+    
     try:
         r = requests.post("https://api.openai.com/v1/chat/completions",
             headers={"Authorization": f"Bearer {API_KEY}"},
@@ -84,11 +60,10 @@ if query:
                                {"role": "user", "content": pregunta}]})
         respuesta = r.json()["choices"][0]["message"]["content"]
     except:
-        respuesta = "Problema de conexión. Escribe a belen.bastias@nutrisco.com"
+        respuesta = "Problema de conexión."
 
     st.markdown(f'<div class="assistant">{respuesta}</div>', unsafe_allow_html=True)
     st.session_state.messages.append({"role": "assistant", "content": respuesta})
-    st.experimental_set_query_params()
     st.rerun()
 
 st.markdown('<div class="footer"><br>Inteligencia Artificial al servicio de las personas – Nutrisco © 2025</div>', unsafe_allow_html=True)
