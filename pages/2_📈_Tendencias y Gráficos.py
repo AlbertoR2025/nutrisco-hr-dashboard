@@ -123,11 +123,9 @@ with st.container():
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ==================== FOOTER ====================
-# Footer limpio y corporativo (solo Nutrisco)
 st.markdown("""
 <div class="footer">
-    <p style="margin:0; font-size:0.95rem; color:#94a3b8;">
-        Inteligencia Artificial al servicio de las personas – Nutrisco
-    </p>
+    <br>
+    Inteligencia Artificial al servicio de las personas – Nutrisco  © 2025
 </div>
 """, unsafe_allow_html=True)
