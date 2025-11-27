@@ -12,20 +12,26 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# ========== CSS MODERNO Y LIMPIO ==========
 st.markdown("""
 <style>
-/* Ocultar elementos Streamlit agresivamente */
-header, footer, [data-testid="stToolbar"], [data-testid="stDeployButton"],
-.stDeployButton, [data-testid="stStatusWidget"], [data-testid="stDecoration"],
-button[title*="Deploy"], button[title*="View"], a[href*="github"], a[href*="streamlit"] {
+/* === ELIMINAR STREAMLIT === */
+header, footer,
+[data-testid="stToolbar"],
+[data-testid="stDeployButton"],
+.stDeployButton,
+[data-testid="stStatusWidget"],
+[data-testid="stDecoration"],
+button[title*="Deploy"],
+button[title*="View"],
+a[href*="github"],
+a[href*="streamlit"] {
     display: none !important;
     visibility: hidden !important;
-    position: absolute !important;
-    left: -9999px !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
 }
 
-/* Fondo limpio */
+/* === FONDO === */
 .stApp {
     background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
 }
@@ -33,10 +39,10 @@ button[title*="Deploy"], button[title*="View"], a[href*="github"], a[href*="stre
 .block-container {
     max-width: 800px !important;
     margin: 0 auto !important;
-    padding: 2rem 1rem 110px 1rem !important;
+    padding: 2rem 1rem 120px 1rem !important;
 }
 
-/* Header moderno y centrado */
+/* === HEADER === */
 .header {
     background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
     padding: 2.8rem 2rem;
@@ -51,7 +57,6 @@ button[title*="Deploy"], button[title*="View"], a[href*="github"], a[href*="stre
     font-size: 2.2rem;
     font-weight: 700;
     margin: 0;
-    letter-spacing: -0.02em;
 }
 
 .header h2 {
@@ -67,7 +72,7 @@ button[title*="Deploy"], button[title*="View"], a[href*="github"], a[href*="stre
     font-size: 1rem;
 }
 
-/* Burbujas estilo WhatsApp/iOS modernas */
+/* === BURBUJAS MODERNAS === */
 .user {
     background: linear-gradient(135deg, #3b82f6, #2563eb);
     color: white;
@@ -78,7 +83,6 @@ button[title*="Deploy"], button[title*="View"], a[href*="github"], a[href*="stre
     box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
     font-size: 0.95rem;
     line-height: 1.5;
-    word-wrap: break-word;
 }
 
 .bot {
@@ -91,7 +95,6 @@ button[title*="Deploy"], button[title*="View"], a[href*="github"], a[href*="stre
     box-shadow: 0 2px 8px rgba(234, 88, 12, 0.3);
     font-size: 0.95rem;
     line-height: 1.5;
-    word-wrap: break-word;
 }
 
 .footer {
@@ -102,17 +105,19 @@ button[title*="Deploy"], button[title*="View"], a[href*="github"], a[href*="stre
     opacity: 0.7;
 }
 
-/* Chat input fijo y limpio */
+/* === CHAT INPUT (z-index máximo para que quede siempre visible) === */
 [data-testid="stChatInput"] {
     position: fixed !important;
     bottom: 0 !important;
     left: 0 !important;
     right: 0 !important;
-    background: rgba(15, 23, 42, 0.95) !important;
-    padding: 12px !important;
-    border-top: 1px solid rgba(71, 85, 105, 0.3) !important;
-    backdrop-filter: blur(12px) !important;
-    z-index: 999999 !important;
+    width: 100% !important;
+    background: rgba(15, 23, 42, 0.98) !important;
+    padding: 14px 12px 20px 12px !important;
+    border-top: 1px solid rgba(71, 85, 105, 0.4) !important;
+    backdrop-filter: blur(14px) !important;
+    z-index: 2147483647 !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.25) !important;
 }
 
 [data-testid="stChatInput"] > div {
@@ -121,17 +126,18 @@ button[title*="Deploy"], button[title*="View"], a[href*="github"], a[href*="stre
     display: flex !important;
     gap: 10px !important;
     align-items: center !important;
+    position: relative !important;
 }
 
-/* Input de texto moderno */
+/* Input texto */
 [data-testid="stChatInput"] textarea {
-    border-radius: 24px !important;
-    border: 1.5px solid #334155 !important;
+    border-radius: 26px !important;
+    border: 2px solid #334155 !important;
     background: #1e293b !important;
     color: #f1f5f9 !important;
-    font-size: 0.95rem !important;
-    padding: 12px 60px 12px 18px !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+    font-size: 1rem !important;
+    padding: 14px 60px 14px 20px !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2) !important;
     resize: none !important;
     transition: all 0.2s ease !important;
 }
@@ -142,30 +148,34 @@ button[title*="Deploy"], button[title*="View"], a[href*="github"], a[href*="stre
 
 [data-testid="stChatInput"] textarea:focus {
     border-color: #ea580c !important;
-    box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.15), 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+    box-shadow:
+        0 0 0 3px rgba(234, 88, 12, 0.2),
+        0 4px 16px rgba(0, 0, 0, 0.3) !important;
     outline: none !important;
 }
 
-/* Botón de envío moderno y visible */
+/* Botón de envío (z-index altísimo para que siempre esté encima) */
 [data-testid="stChatInput"] button {
     background: linear-gradient(135deg, #ea580c, #dc2626) !important;
     border-radius: 50% !important;
-    width: 48px !important;
-    height: 48px !important;
-    min-width: 48px !important;
-    min-height: 48px !important;
+    width: 50px !important;
+    height: 50px !important;
+    min-width: 50px !important;
+    min-height: 50px !important;
     padding: 0 !important;
     margin: 0 !important;
     border: none !important;
-    box-shadow: 0 4px 12px rgba(234, 88, 12, 0.4) !important;
+    box-shadow: 0 6px 16px rgba(234, 88, 12, 0.45) !important;
     transition: all 0.2s ease !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     position: absolute !important;
-    right: 6px !important;
-    bottom: 6px !important;
-    z-index: 10 !important;
+    right: 8px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 2147483647 !important;
+    cursor: pointer !important;
 }
 
 [data-testid="stChatInput"] button svg {
@@ -176,31 +186,26 @@ button[title*="Deploy"], button[title*="View"], a[href*="github"], a[href*="stre
 
 [data-testid="stChatInput"] button:hover {
     background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
-    transform: scale(1.05) !important;
-    box-shadow: 0 6px 16px rgba(234, 88, 12, 0.5) !important;
+    transform: translateY(-50%) scale(1.08) !important;
+    box-shadow: 0 8px 20px rgba(234, 88, 12, 0.55) !important;
 }
 
 [data-testid="stChatInput"] button:active {
-    transform: scale(0.95) !important;
+    transform: translateY(-50%) scale(0.96) !important;
 }
 
-/* Responsive móvil */
+/* === RESPONSIVE === */
 @media (max-width: 768px) {
     .block-container {
-        padding: 1rem 0.8rem 110px 0.8rem !important;
+        padding: 1rem 0.8rem 130px 0.8rem !important;
     }
     
     .header {
         padding: 2rem 1.5rem;
-        border-radius: 20px;
     }
     
     .header h1 {
         font-size: 1.8rem;
-    }
-    
-    .header h2 {
-        font-size: 1.1rem;
     }
     
     .user, .bot {
@@ -210,44 +215,52 @@ button[title*="Deploy"], button[title*="View"], a[href*="github"], a[href*="stre
     }
     
     [data-testid="stChatInput"] textarea {
-        font-size: 0.9rem !important;
-        padding: 11px 55px 11px 16px !important;
+        font-size: 0.92rem !important;
+        padding: 12px 56px 12px 18px !important;
     }
     
     [data-testid="stChatInput"] button {
-        width: 42px !important;
-        height: 42px !important;
-        min-width: 42px !important;
-        min-height: 42px !important;
+        width: 44px !important;
+        height: 44px !important;
+        min-width: 44px !important;
+        min-height: 44px !important;
+        right: 6px !important;
     }
 }
 </style>
 
 <script>
-// Eliminar elementos Streamlit persistentemente
+// Eliminar corona/foto/elementos streamlit agresivamente
 (function() {
-    function removeStreamlitElements() {
-        const selectors = [
-            'header', 'footer', '[data-testid="stToolbar"]',
-            '[data-testid="stDeployButton"]', '.stDeployButton',
-            '[data-testid="stStatusWidget"]', '[data-testid="stDecoration"]',
-            'button[title*="Deploy"]', 'button[title*="View"]',
-            'a[href*="github"]', 'a[href*="streamlit"]'
+    function kill() {
+        const badSelectors = [
+            'header', 'footer',
+            '[data-testid="stToolbar"]',
+            '[data-testid="stDeployButton"]',
+            '.stDeployButton',
+            '[data-testid="stStatusWidget"]',
+            '[data-testid="stDecoration"]',
+            'button[title*="Deploy"]',
+            'button[title*="View"]',
+            'a[href*="github"]',
+            'a[href*="streamlit"]'
         ];
-        selectors.forEach(sel => {
-            document.querySelectorAll(sel).forEach(el => {
-                el.remove();
-            });
+        badSelectors.forEach(sel => {
+            document.querySelectorAll(sel).forEach(el => el.remove());
         });
     }
     
-    document.addEventListener('DOMContentLoaded', removeStreamlitElements);
-    setInterval(removeStreamlitElements, 1000);
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', kill);
+    } else {
+        kill();
+    }
+    
+    setInterval(kill, 500);
 })();
 </script>
 """, unsafe_allow_html=True)
 
-# ========== LÓGICA DEL CHATBOT ==========
 API_KEY = os.getenv("OPENAI_API_KEY")
 if not API_KEY:
     st.error("⚠️ Falta configurar OPENAI_API_KEY")
@@ -277,7 +290,6 @@ for msg in st.session_state.messages:
     else:
         st.markdown(f'<div class="bot">{msg["content"]}</div>', unsafe_allow_html=True)
 
-# Input con Enter automático
 if prompt := st.chat_input("Escribe tu consulta aquí..."):
     st.session_state.messages.append({"role": "user", "content": prompt})
     
