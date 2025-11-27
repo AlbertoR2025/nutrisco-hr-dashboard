@@ -1,13 +1,14 @@
-# Panel de Control.py → VERSIÓN FINAL 100% PERFECTA (26-nov-2025)
+# ==================== IMPORTS LIMPIOS (sin reload - funciona en Cloud) ====================
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import importlib
 
-# --------------------------------------------------------------
-import utils.data_loader
-importlib.reload(utils.data_loader)
-from utils.data_loader import load_data
+# Importar data_loader SIN reload (evita errores en Cloud)
+try:
+    from utils.data_loader import load_data
+except ImportError:
+    st.error("No se encontró utils/data_loader.py. Verifica la estructura de carpetas.")
+    st.stop()
 # --------------------------------------------------------------
 
 st.set_page_config(
