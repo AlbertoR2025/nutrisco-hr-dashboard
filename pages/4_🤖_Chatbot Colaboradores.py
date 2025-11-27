@@ -1,8 +1,8 @@
-# pages/4_🤖_Chatbot Colaboradores.py → VERSIÓN FINAL 2025: SIN FOTO/CORONA, SIMÉTRICO DESKTOP/MÓVIL (FIX V1.38 DISCUSS #80477)
+# pages/4_🤖_Chatbot Colaboradores.py → VERSIÓN FINAL 2025: SIN FOTO/CORONA, SIMÉTRICO DESKTOP/MÓVIL (FIX V1.40)
 import streamlit as st
 import pandas as pd
 import requests
-import os
+import os 
 import time
 from datetime import datetime
 from dotenv import load_dotenv
@@ -13,54 +13,183 @@ st.set_page_config(
     page_title="Chatbot Colaboradores – Nutrisco",
     page_icon="💬",
     layout="centered",
-    initial_sidebar_state="collapsed"  # Hamburguesa visible para volver atrás
+    initial_sidebar_state="collapsed"
 )
 
-# ==================== CSS DEFINITIVO 2025 (DE DISCUSS #80477 – .stAppDeployButton PARA CORONA) ====================
+# ==================== CSS DEFINITIVO 2025 (OCULTAR CORONA, FOTO, ALINEAR MENSAJES) ====================
 st.markdown("""
 <style>
-    /* OCULTAR CORONA ROJA (DEPLOY BUTTON V1.38+ - DE DISCUSS #80477) */
-    .stAppDeployButton {visibility: hidden !important; display: none !important;}
-    button[data-testid="stDeployButton"], .stDeployButton {display: none !important; visibility: hidden !important; height: 0 !important; z-index: -1 !important;}
-
-    /* OCULTAR HOSTED FOOTER Y LOGO GITHUB (DE FOROS NOV 2025) */
-    footer, [data-testid="stStatusWidget"], div[class*="hosted"], div:contains("Streamlit") {display: none !important; visibility: hidden !important; height: 0 !important;}
-    a[href*="github.com"] {display: none !important;}  /* Oculta logo GitHub/fork */
-
-    /* OCULTAR FOTO/AVATAR/CUADRADO EN INPUT (FIX #12132 MÓVIL - CONTENEDOR PRIMERO) */
-    [data-testid="stChatInput"] > div:first-child {display: none !important;}  /* Oculta el contenedor del avatar */
-    [data-testid="stChatInput"] img, [data-testid="stChatInput"] svg, [data-testid="stChatInput"] [alt*="avatar"] {display: none !important; visibility: hidden !important; width: 0 !important; height: 0 !important; opacity: 0 !important;}
-
-    /* OCULTAR AVATARES EN MENSAJES */
-    [data-testid="stChatMessage"] img, [data-testid="stChatMessage"] svg, [data-testid="stAvatar"] {display: none !important; visibility: hidden !important; width: 0 !important; height: 0 !important;}
-
-    /* LAYOUT SIMÉTRICO RESPONSIVO (SIN DESCUADRADO – MEDIA QUERIES NOV 2025) */
-    .main .block-container {max-width: 800px !important; margin: 0 auto !important; padding: 1rem !important; width: auto !important;}
-    @media (max-width: 768px) {
-        .main .block-container {width: 95% !important; padding: 0.5rem !important;}
-        [data-testid="stChatInput"] {max-width: 100% !important; margin: 0 auto !important; padding-bottom: 2rem !important;}
+    /* OCULTAR CORONA ROJA (DEPLOY BUTTON) - MÁS ROBUSTO */
+    .stAppDeployButton, button[data-testid="stDeployButton"], .stDeployButton {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        width: 0 !important;
+        z-index: -9999 !important;
+        position: absolute !important;
     }
-    .stApp {background-color: #0e1117 !important;}
 
-    /* ESTILOS MENSAJES SIMÉTRICOS (MARGIN IGUAL IZQUIERDA/DERECHA) */
-    [data-testid="stChatMessage"] {padding: 0 !important; gap: 0 !important;}
-    .user-message {background: #262730 !important; color: white !important; border-radius: 18px !important; padding: 14px 20px !important; margin: 16px 8% 16px auto !important; max-width: 75% !important; box-shadow: 0 2px 10px rgba(0,0,0,0.4) !important;}
-    .assistant-message {background: linear-gradient(135deg, #ea580c, #f97316) !important; color: white !important; border-radius: 18px !important; padding: 14px 20px !important; margin: 16px auto 16px 8% !important; max-width: 75% !important; box-shadow: 0 4px 15px rgba(249,115,22,0.5) !important;}
-    @media (max-width: 768px) {.user-message, .assistant-message {max-width: 90% !important; padding: 12px 16px !important; margin: 12px 4% 12px auto !important;}}  /* Simétrico en móvil */
-    .header-box {background: linear-gradient(90deg, #ea580c, #c2410c) !important; padding: 2rem !important; border-radius: 20px !important; text-align: center !important; color: white !important; box-shadow: 0 10px 30px rgba(234,88,12,0.4) !important; margin: 0 auto !important;}
-    @media (max-width: 768px) {.header-box {padding: 1.5rem !important;}}
-    .belén-box {background: #dc2626 !important; color: white !important; padding: 1.3rem !important; border-radius: 15px !important; text-align: center !important; font-weight: bold !important; margin: 2rem auto !important; font-size: 1.15rem !important; box-shadow: 0 4px 15px rgba(220,38,38,0.4) !important;}
-    @media (max-width: 768px) {.belén-box {font-size: 1rem !important; padding: 1rem !important;}}
-    .footer {text-align: center !important; margin-top: 4rem !important; color: #64748b !important; font-size: 0.95rem !important; padding: 2rem 0 !important; position: relative !important; z-index: 10 !important;}
-    .typing {font-style: italic !important; color: #94a3b8 !important; margin: 15px 0 !important; text-align: left !important;}
-    @keyframes blink {0%, 100% {opacity: 1;} 50% {opacity: 0;}}
+    /* OCULTAR AVATAR EN INPUT Y MENSAJES */
+    [data-testid="stChatInput"] > div:first-child,
+    [data-testid="stChatInput"] img,
+    [data-testid="stChatInput"] svg,
+    [data-testid="stChatInput"] [alt*="avatar"],
+    [data-testid="stChatMessage"] img,
+    [data-testid="stChatMessage"] svg,
+    [data-testid="stAvatar"] {
+        display: none !important;
+        visibility: hidden !important;
+        width: 0 !important;
+        height: 0 !important;
+        opacity: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* OCULTAR FOOTER STREAMLIT Y LOGOS */
+    footer, [data-testid="stStatusWidget"], div[class*="hosted"], div:contains("Streamlit"), a[href*="github.com"] {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+    }
+
+    /* LAYOUT CENTRADO RESPONSIVO */
+    .main .block-container {
+        max-width: 800px !important;
+        margin: 0 auto !important;
+        padding: 1rem !important;
+        width: 100% !important;
+    }
+    @media (max-width: 768px) {
+        .main .block-container {
+            width: 95% !important;
+            padding: 0.5rem !important;
+        }
+        [data-testid="stChatInput"] {
+            max-width: 100% !important;
+            margin: 0 auto !important;
+            padding-bottom: 2rem !important;
+        }
+    }
+
+    /* ESTILOS DE MENSAJES - SIMÉTRICOS IZQ/DERECHA */
+    [data-testid="stChatMessage"] {
+        padding: 0 !important;
+        gap: 0 !important;
+    }
+    .user-message {
+        background: #262730 !important;
+        color: white !important;
+        border-radius: 18px !important;
+        padding: 14px 20px !important;
+        margin: 16px 8% 16px auto !important;
+        max-width: 75% !important;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.4) !important;
+    }
+    .assistant-message {
+        background: linear-gradient(135deg, #ea580c, #f97316) !important;
+        color: white !important;
+        border-radius: 18px !important;
+        padding: 14px 20px !important;
+        margin: 16px auto 16px 8% !important;
+        max-width: 75% !important;
+        box-shadow: 0 4px 15px rgba(249,115,22,0.5) !important;
+    }
+    @media (max-width: 768px) {
+        .user-message, .assistant-message {
+            max-width: 90% !important;
+            padding: 12px 16px !important;
+            margin: 12px 4% 12px auto !important;
+        }
+    }
+
+    /* CABECERA CORPORATIVA */
+    .header-box {
+        background: linear-gradient(90deg, #ea580c, #c2410c) !important;
+        padding: 2rem !important;
+        border-radius: 20px !important;
+        text-align: center !important;
+        color: white !important;
+        box-shadow: 0 10px 30px rgba(234,88,12,0.4) !important;
+        margin: 0 auto !important;
+        max-width: 90% !important;
+    }
+    @media (max-width: 768px) {
+        .header-box { padding: 1.5rem !important; }
+    }
+
+    /* CAJA DE BELÉN (TEMAS SENSIBLES) */
+    .belén-box {
+        background: #dc2626 !important;
+        color: white !important;
+        padding: 1.3rem !important;
+        border-radius: 15px !important;
+        text-align: center !important;
+        font-weight: bold !important;
+        margin: 2rem auto !important;
+        font-size: 1.15rem !important;
+        box-shadow: 0 4px 15px rgba(220,38,38,0.4) !important;
+        max-width: 90% !important;
+    }
+    @media (max-width: 768px) {
+        .belén-box { font-size: 1rem !important; padding: 1rem !important; }
+    }
+
+    /* FOOTER */
+    .footer {
+        text-align: center !important;
+        margin-top: 4rem !important;
+        color: #64748b !important;
+        font-size: 0.95rem !important;
+        padding: 2rem 0 !important;
+        position: relative !important;
+        z-index: 10 !important;
+    }
+
+    /* ESCRIBIENDO... */
+    .typing {
+        font-style: italic !important;
+        color: #94a3b8 !important;
+        margin: 15px 0 !important;
+        text-align: left !important;
+    }
+
+    /* ANIMACIÓN BLINK */
+    @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0; }
+    }
 </style>
 
-<!-- JS DINÁMICO: BORRA RESIDUALES CADA 300MS (FIX DINÁMICO MÓVIL 2025) -->
+<!-- JS DINÁMICO: BORRA ELEMENTOS RESIDUALES CADA 300MS -->
 <script>
     setInterval(() => {
-        const elements = document.querySelectorAll('button[data-testid="stDeployButton"], .stDeployButton, .stAppDeployButton, [data-testid="stChatInput"] img, [data-testid="stChatInput"] svg, [data-testid="stAvatar"], footer, [data-testid="stStatusWidget"], img[alt*="avatar"], div:contains("Streamlit"), div:contains("Hosted")');
-        elements.forEach(el => { if (el) { el.style.display = 'none'; el.remove(); } });
+        // Seleccionamos todos los elementos problemáticos
+        const elements = document.querySelectorAll(
+            'button[data-testid="stDeployButton"], .stDeployButton, .stAppDeployButton, ' +
+            '[data-testid="stChatInput"] img, [data-testid="stChatInput"] svg, ' +
+            '[data-testid="stAvatar"], footer, [data-testid="stStatusWidget"], ' +
+            'div:contains("Streamlit"), div:contains("Hosted"), img[alt*="avatar"], ' +
+            'a[href*="github.com"]'
+        );
+        elements.forEach(el => {
+            if (el && el.parentNode) {
+                el.style.display = 'none';
+                el.style.visibility = 'hidden';
+                el.style.height = '0';
+                el.style.width = '0';
+                el.style.opacity = '0';
+                el.style.zIndex = '-9999';
+                el.style.position = 'absolute';
+                // Intentamos removerlo del DOM
+                try {
+                    el.remove();
+                } catch (e) {
+                    // Si no se puede remover, al menos lo ocultamos
+                    el.setAttribute('style', 'display:none !important; visibility:hidden !important;');
+                }
+            }
+        });
     }, 300);
 </script>
 """, unsafe_allow_html=True)
