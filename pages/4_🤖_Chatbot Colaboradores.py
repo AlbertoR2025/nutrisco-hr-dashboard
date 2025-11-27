@@ -120,9 +120,9 @@ css_code = '''
         height: 0 !important;
     }
 
-    /* OCULTAR BOTÓN DE ENVÍO (FLECHA) */
+    /* MANTENER BOTÓN DE ENVÍO (FLECHA) */
     [data-testid="stChatInput"] > div > div > div > button {
-        display: none !important;
+        display: block !important;
     }
 </style>
 '''
@@ -143,8 +143,8 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Input personalizado (sin avatar ni flecha)
-user_input = st.text_input("Escribe tu consulta aquí...", placeholder="", key="chat_input")
+# Input personalizado (sin avatar)
+user_input = st.chat_input("Escribe tu consulta aquí...")
 
 if user_input:
     # Mensaje del usuario
