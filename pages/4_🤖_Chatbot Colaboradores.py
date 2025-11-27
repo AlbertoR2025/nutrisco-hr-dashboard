@@ -17,30 +17,47 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# ==================== CSS NUCLEAR - ELIMINAR TODO Y BOTÓN VISIBLE ====================
+# ==================== CSS NUCLEAR - ELIMINAR CORONA Y AVATARES ====================
 st.markdown("""
 <style>
-    /* === ELIMINACIÓN RADICAL DE ELEMENTOS STREAMLIT === */
+    /* === ELIMINACIÓN COMPLETA DE TODOS LOS ELEMENTOS STREAMLIT === */
+    
+    /* 1. ELIMINAR CORONA (DEPLOY BUTTON) - MÁS AGRESIVO */
+    [data-testid="stDeployButton"],
+    .stAppDeployButton,
+    button[title="View app source"],
+    button[title="Deploy this app"],
+    [data-testid="baseButton-secondary"] {
+        display: none !important;
+        visibility: hidden !important;
+        width: 0px !important;
+        height: 0px !important;
+        opacity: 0 !important;
+        position: absolute !important;
+        left: -9999px !important;
+        z-index: -9999 !important;
+    }
+    
+    /* 2. ELIMINAR HEADER COMPLETO */
     header, [data-testid="stHeader"] {
         display: none !important;
         height: 0px !important;
         visibility: hidden !important;
     }
     
-    footer, [data-testid="stToolbar"], [data-testid="stDeployButton"] {
+    /* 3. ELIMINAR FOOTER Y TOOLBAR */
+    footer, [data-testid="stToolbar"] {
         display: none !important;
         visibility: hidden !important;
     }
     
-    /* === ELIMINAR COMPLETAMENTE AVATARES Y CORONAS === */
+    /* 4. ELIMINAR AVATARES COMPLETAMENTE */
     [data-testid="stChatMessage"] [data-testid="stAvatar"],
     [data-testid="stChatMessage"] img,
     [data-testid="stChatMessage"] svg,
     [data-testid="stChatInput"] [data-testid="stAvatar"],
     [data-testid="stChatInput"] img,
-    [data-testid="stChatInput"] svg,
-    .stChatMessage img,
-    .stChatMessage svg {
+    [data-testid="stChatInput"] svg {
         display: none !important;
         width: 0px !important;
         height: 0px !important;
@@ -48,19 +65,18 @@ st.markdown("""
         opacity: 0 !important;
     }
     
-    /* === CONTENEDOR PRINCIPAL CON ESPACIO PARA INPUT === */
+    /* === ESTILOS DE LA APLICACIÓN === */
     .main .block-container {
         max-width: 800px;
         margin: 0 auto;
         padding: 1rem;
-        padding-bottom: 120px !important; /* Espacio extra para input fijo */
+        padding-bottom: 120px !important;
     }
     
     .stApp {
         background-color: #0e1117 !important;
     }
     
-    /* === ESTILOS VISUALES === */
     .header-box {
         background: linear-gradient(90deg, #ea580c, #c2410c);
         padding: 2rem;
@@ -98,101 +114,137 @@ st.markdown("""
         padding: 2rem 0;
     }
     
-    /* === SOLUCIÓN CRÍTICA: INPUT PERSONALIZADO CON BOTÓN === */
+    /* === INPUT PERSONALIZADO CON Z-INDEX MUY ALTO === */
     .custom-input-container {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: #0e1117;
-        padding: 1rem;
-        border-top: 1px solid #333;
-        z-index: 10000;
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        justify-content: center;
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        background: #0e1117 !important;
+        padding: 1rem !important;
+        border-top: 1px solid #333 !important;
+        z-index: 2147483647 !important; /* Máximo z-index posible */
+        display: flex !important;
+        justify-content: center !important;
     }
     
     .custom-input-wrapper {
-        display: flex;
-        gap: 10px;
-        width: 90%;
-        max-width: 800px;
-        align-items: center;
+        display: flex !important;
+        gap: 10px !important;
+        width: 90% !important;
+        max-width: 800px !important;
+        align-items: center !important;
     }
     
     .custom-text-input {
-        flex: 1;
-        background: #1e1e1e;
-        color: white;
-        border: 1px solid #444;
-        border-radius: 25px;
-        padding: 12px 20px;
-        font-size: 16px;
-        outline: none;
+        flex: 1 !important;
+        background: #1e1e1e !important;
+        color: white !important;
+        border: 1px solid #444 !important;
+        border-radius: 25px !important;
+        padding: 12px 20px !important;
+        font-size: 16px !important;
+        outline: none !important;
+        z-index: 2147483647 !important;
     }
     
     .custom-text-input:focus {
-        border-color: #ea580c;
-        box-shadow: 0 0 0 2px rgba(234, 88, 12, 0.2);
+        border-color: #ea580c !important;
+        box-shadow: 0 0 0 2px rgba(234, 88, 12, 0.2) !important;
     }
     
     .custom-send-button {
-        background: #ea580c;
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 18px;
+        background: #ea580c !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 50% !important;
+        width: 50px !important;
+        height: 50px !important;
+        cursor: pointer !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 18px !important;
+        z-index: 2147483647 !important;
     }
     
     .custom-send-button:hover {
-        background: #c2410c;
+        background: #c2410c !important;
     }
     
-    /* Responsive */
     @media (max-width: 768px) {
         .custom-input-wrapper {
-            width: 95%;
+            width: 95% !important;
         }
         
         .user-msg, .assistant-msg {
-            max-width: 85%;
+            max-width: 85% !important;
         }
         
         .header-box {
-            padding: 1.5rem;
+            padding: 1.5rem !important;
         }
     }
 </style>
 
-<!-- JAVASCRIPT PARA ELIMINAR ELEMENTOS PERSISTENTES -->
+<!-- JAVASCRIPT MÁS AGRESIVO PARA ELIMINAR LA CORONA -->
 <script>
-function eliminarElementosNoDeseados() {
-    // Eliminar cualquier avatar residual
-    const avatares = document.querySelectorAll('[data-testid="stAvatar"], img, svg');
-    avatares.forEach(el => {
-        if (el.parentElement && el.closest('[data-testid="stChatMessage"]')) {
-            el.remove();
-        }
+function eliminarCoronaYAvatares() {
+    // ELIMINAR CORONA Y BOTONES DE DEPLOY
+    const elementosCorona = document.querySelectorAll([
+        '[data-testid="stDeployButton"]',
+        '.stAppDeployButton', 
+        'button[title*="Deploy"]',
+        'button[title*="View"]',
+        '[data-testid="baseButton-secondary"]',
+        'header',
+        '[data-testid="stHeader"]'
+    ].join(','));
+    
+    elementosCorona.forEach(el => {
+        el.remove();
+        el.style.display = 'none';
+        el.style.visibility = 'hidden';
+        el.style.opacity = '0';
     });
     
-    // Eliminar elementos del header
-    document.querySelectorAll('header, [data-testid="stHeader"]').forEach(el => {
-        el.remove();
+    // ELIMINAR AVATARES
+    const avatares = document.querySelectorAll([
+        '[data-testid="stAvatar"]',
+        '[data-testid="stChatMessageAvatar"]',
+        '.stChatMessage img',
+        '.stChatMessage svg'
+    ].join(','));
+    
+    avatares.forEach(avatar => {
+        avatar.remove();
+        avatar.style.display = 'none';
+    });
+    
+    // FORZAR ELIMINACIÓN DE ELEMENTOS EN EL BODY
+    document.querySelectorAll('*').forEach(el => {
+        const style = window.getComputedStyle(el);
+        if (style.position === 'fixed' && (style.top === '0px' || style.right === '0px')) {
+            if (el.innerHTML.includes('Deploy') || el.innerHTML.includes('Streamlit')) {
+                el.remove();
+            }
+        }
     });
 }
 
-// Ejecutar múltiples veces
-setTimeout(eliminarElementosNoDeseados, 100);
-setTimeout(eliminarElementosNoDeseados, 500);
-setInterval(eliminarElementosNoDeseados, 1000);
+// EJECUTAR INMEDIATAMENTE Y PERSISTENTEMENTE
+document.addEventListener('DOMContentLoaded', eliminarCoronaYAvatares);
+setTimeout(eliminarCoronaYAvatares, 100);
+setTimeout(eliminarCoronaYAvatares, 500);
+setTimeout(eliminarCoronaYAvatares, 1000);
+
+// EJECUTAR CADA SEGUNDO DURANTE 10 SEGUNDOS
+let ejecuciones = 0;
+const intervalo = setInterval(() => {
+    eliminarCoronaYAvatares();
+    ejecuciones++;
+    if (ejecuciones > 10) clearInterval(intervalo);
+}, 1000);
 </script>
 """, unsafe_allow_html=True)
 
@@ -229,7 +281,7 @@ for message in st.session_state.messages:
     else:
         st.markdown(f'<div class="assistant-msg">{message["content"]}</div>', unsafe_allow_html=True)
 
-# ==================== INPUT PERSONALIZADO CON BOTÓN ====================
+# ==================== INPUT PERSONALIZADO CON BOTÓN VISIBLE ====================
 st.markdown("""
 <div class="custom-input-container">
     <div class="custom-input-wrapper">
@@ -262,7 +314,10 @@ document.getElementById('customChatInput').addEventListener('keypress', function
 });
 
 // Focus en el input al cargar
-document.getElementById('customChatInput').focus();
+setTimeout(() => {
+    const input = document.getElementById('customChatInput');
+    if (input) input.focus();
+}, 1000);
 </script>
 """, unsafe_allow_html=True)
 
