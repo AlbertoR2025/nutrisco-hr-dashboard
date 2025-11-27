@@ -1,6 +1,6 @@
 [theme]
-primaryColor = "#f97316"          # Naranja Nutrisco
-backgroundColor = "#0f172a"       # Fondo oscuro
+primaryColor = "#f97316"
+backgroundColor = "#0f172a"
 secondaryBackgroundColor = "#1e293b"
 textColor = "#ffffff"
 font = "sans serif"
@@ -13,3 +13,8 @@ port = 8501
 
 [browser]
 gatherUsageStats = false
+
+[client]
+toolbarMode = "minimal"
+showErrorDetails = false
+showSidebarNavigation = false
