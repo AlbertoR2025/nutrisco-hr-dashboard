@@ -176,8 +176,8 @@ window.addEventListener('load', function() {
 </script>
 '''
 
-# Aplica el CSS y JS usando st.markdown con comillas simples
-st.markdown(css_js_code, unsafe_allow_html=True)
+# Aplica el CSS y JS usando st.write
+st.write(css_js_code, unsafe_allow_html=True)
 
 # ==================== CONTENIDO DEL CHATBOT ====================
 st.markdown('<div class="header-box"><h1>Chatbot Colaboradores</h1><p>Nutrisco – Atención Personas</p><p>Escribe tu duda y te respondo al instante</p></div>', unsafe_allow_html=True)
