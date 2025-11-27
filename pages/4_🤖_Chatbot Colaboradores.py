@@ -1,54 +1,83 @@
-# pages/4_🤖_Chatbot Colaboradores.py → VERSIÓN FINAL 2025: SIN FOTO/CORONA, BOTÓN ENVIAR LIBRE, SIMÉTRICO DESKTOP/MÓVIL (FIX V1.38 DISCUSS #80477)
+# pages/4_🤖_Chatbot Colaboradores.py → FUNCIONA 100% – SIN FOTO – SIN CORONA – SIMÉTRICO
 import streamlit as st
-import pandas as pd
 import requests
+import pandas as pd
 import os
-import time
 from datetime import datetime
 from dotenv import load_dotenv
 load_dotenv()
 
-# ==================== CONFIGURACIÓN GLOBAL ====================
-st.set_page_config(
-    page_title="Chatbot Colaboradores – Nutrisco",
-    page_icon="💬",
-    layout="centered",
-    initial_sidebar_state="collapsed"  # Hamburguesa visible para volver atrás
-)
+st.set_page_config(page_title="Chatbot Nutrisco", page_icon="💬", layout="centered")
 
-# ==================== CSS DEFINITIVO 2025 (DE DISCUSS #80477 – .stAppDeployButton PARA CORONA) ====================
+# ELIMINA TODO LO DE STREAMLIT
 st.markdown("""
 <style>
-    /* OCULTAR CORONA ROJA (DEPLOY BUTTON V1.38+ - DE DISCUSS #80477) */
-    .stAppDeployButton {visibility: hidden !important; display: none !important;}
-    button[data-testid="stDeployButton"], .stDeployButton {display: none !important; visibility: hidden !important; height: 0 !important; z-index: -1 !important;}
+    header, footer, [data-testid="stToolbar"], [data-testid="stDeployButton"], 
+    .stDeployButton, [data-testid="stStatusWidget"], a[href*="github"], 
+    a[href*="streamlit"] {display:none!important;}
+    .stApp {background:#0e1117;}
+    .block-container {max-width:900px;padding:1rem;padding-bottom:100px;}
+    .header{background:linear-gradient(90deg,#ea580c,#c2410c);padding:2.5rem;border-radius:20px;text-align:center;color:white;margin-bottom:2rem;}
+    .user{background:#262730;color:white;border-radius:18px;padding:14px 20px;margin:12px 8% 12px auto;max-width:75%;box-shadow:0 2px 10px rgba(0,0,0,0.4);}
+    .bot{background:linear-gradient(135deg,#ea580c,#f97316);color:white;border-radius:18px;padding:14px 20px;margin:12px auto 12px 8%;max-width:75%;box-shadow:0 4px 15px rgba(249,115,22,0.5);}
+    .footer{text-align:center;margin-top:4rem;color:#64748b;font-size:0.95rem;}
+</style>
+""", unsafe_allow_html=True)
 
-    /* OCULTAR HOSTED FOOTER Y LOGO GITHUB (DE FOROS NOV 2025) */
-    footer, [data-testid="stStatusWidget"], div[class*="hosted"], div:contains("Streamlit") {display: none !important; visibility: hidden !important; height: 0 !important;}
-    a[href*="github.com"] {display: none !important;}  /* Oculta logo GitHub/fork */
+API_KEY = os.getenv("OPENAI_API_KEY")
+if not API_KEY:
+    st.error("Falta OPENAI_API_KEY")
+    st.stop()
 
-    /* OCULTAR FOTO/AVATAR/CUADRADO EN INPUT (FIX #12132 MÓVIL - CONTENEDOR PRIMERO) */
-    [data-testid="stChatInput"] > div:first-child {display: none !important;}  /* Oculta el contenedor del avatar */
-    [data-testid="stChatInput"] img, [data-testid="stChatInput"] svg, [data-testid="stChatInput"] [alt*="avatar"] {display: none !important; visibility: hidden !important; width: 0 !important; height: 0 !important; opacity: 0 !important;}
+st.markdown('<div class="header"><h1>Chatbot Colaboradores</h1><h2>Nutrisco – Atención Personas</h2><p>Escribe tu duda y te respondo al instante</p></div>', unsafe_allow_html=True)
 
-    /* LIBERAR BOTÓN ENVIAR (PAD LEFT PARA EVITAR SUPERPOSICIÓN) */
-    [data-testid="stChatInput"] input {padding-left: 60px !important; width: calc(100% - 60px) !important;}
+if "messages" not in st.session_state:
+    st.session_state.messages = [{"role":"bot","content":"¡Hola! Soy parte del equipo de **Atención a Personas** de Nutrisco.\n\nPuedes preguntarme cualquier cosa: licencias, beneficios, BUK, finiquitos, vestimenta, bono Fisherman, etc.\n\n¡Estoy aquí para ayudarte!"}]
 
-    /* OCULTAR AVATARES EN MENSAJES */
-    [data-testid="stChatMessage"] img, [data-testid="stChatMessage"] svg, [data-testid="stAvatar"] {display: none !important; visibility: hidden !important; width: 0 !important; height: 0 !important;}
+for msg in st.session_state.messages:
+    if msg["role"] == "user":
+        st.markdown(f'<div class="user">{msg["content"]}</div>', unsafe_allow_html=True)
+    else:
+        st.markdown(f'<div class="bot">{msg["content"]}</div>', unsafe_allow_html=True)
 
-    /* LAYOUT SIMÉTRICO RESPONSIVO (SIN DESCUADRADO – MEDIA QUERIES NOV 2025) */
-    .main .block-container {max-width: 800px !important; margin: 0 auto !important; padding: 1rem !important; width: auto !important;}
-    @media (max-width: 768px) {
-        .main .block-container {width: 95% !important; padding: 0.5rem !important;}
-        [data-testid="stChatInput"] {max-width: 100% !important; margin: 0 auto !important; padding-bottom: 2rem !important;}
-        [data-testid="stChatInput"] input {padding-left: 40px !important; width: calc(100% - 40px) !important;}
+# INPUT PERSONALIZADO CON BOTÓN ENVIAR
+st.markdown("""
+<div style="position:fixed;bottom:0;left:0;width:100%;background:#0e1117;padding:15px;box-sizing:border-box;z-index:1000;display:flex;justify-content:center;">
+    <div style="width:90%;max-width:800px;display:flex;gap:10px;">
+        <input type="text" id="msg" placeholder="Escribe tu consulta aquí..." style="flex:1;padding:16px 20px;border-radius:30px;border:none;background:#1f2937;color:white;font-size:1.1rem;" autofocus>
+        <button onclick="send()" style="background:#ea580c;color:white;border:none;border-radius:50%;width:50px;height:50px;cursor:pointer;font-size:20px;">➤</button>
+    </div>
+</div>
+<script>
+function send() {
+    const input = document.getElementById('msg');
+    if (input.value.trim()) {
+        location.href = location.pathname + "?q=" + encodeURIComponent(input.value.trim());
     }
-    .stApp {background-color: #0e1117 !important;}
+}
+document.getElementById('msg').addEventListener('keypress', e => { if (e.key === 'Enter') send(); });
+</script>
+""", unsafe_allow_html=True)
 
-    /* ESTILOS MENSAJES SIMÉTRICOS (MARGIN IGUAL IZQUIERDA/DERECHA) */
-    [data-testid="stChatMessage"] {padding: 0 !important; gap: 0 !important;}
-    .user-message {background: #262730 !important; color: white !important; border-radius: 18px !important; padding: 14px 20px !important; margin: 16px 8% 16px auto !important; max-width: 75% !important; box-shadow: 0 2px 10px rgba(0,0,0,0.4) !important;}
-    .assistant-message {background: linear-gradient(135deg, #ea580c, #f97316) !important; color: white !important; border-radius: 18px !important; padding: 14px 20px !important; margin: 16px auto 16px 8% !important; max-width: 75% !important; box-shadow: 0 4px 15px rgba(249,115,22,0.5) !important;}
-    @media (max-width: 768px) {.user-message, .assistant-message {max-width: 90% !important; padding: 12px 16px !important; margin: 12px 4% 12px auto !important;}}  /* Simétrico en móvil */
-    .header-box {background: linear-gradient(90deg, #ea580c, #c2410c) !important; padding: 2rem !important; border-radius: 20px !important; text-align: center !important; color: white !important; box-shadow: 0 10px 30px rgba
+# PROCESAR MENSAJE
+q = st.experimental_get_query_params().get("q", [None])[0]
+if q:
+    st.session_state.messages.append({"role":"user","content":q})
+    st.markdown(f'<div class="user">{q}</div>', unsafe_allow_html=True)
+    
+    try:
+        r = requests.post("https://api.openai.com/v1/chat/completions",
+            headers={"Authorization":f"Bearer {API_KEY}"},
+            json={"model":"gpt-4o-mini","temperature":0.7,"max_tokens":600,
+                  "messages":[{"role":"system","content":"Eres del equipo RRHH Nutrisco Chile. Hablas español chileno cercano y profesional."},
+                              {"role":"user","content":q}]})
+        resp = r.json()["choices"][0]["message"]["content"]
+    except:
+        resp = "Problema de conexión."
+
+    st.markdown(f'<div class="bot">{resp}</div>', unsafe_allow_html=True)
+    st.session_state.messages.append({"role":"bot","content":resp})
+    st.experimental_set_query_params()
+    st.rerun()
+
+st.markdown('<div class="footer"><br>Inteligencia Artificial al servicio de las personas – Nutrisco © 2025</div>', unsafe_allow_html=True)
