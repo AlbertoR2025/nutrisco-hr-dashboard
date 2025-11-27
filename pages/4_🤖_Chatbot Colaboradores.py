@@ -7,6 +7,18 @@ from datetime import datetime
 from dotenv import load_dotenv
 load_dotenv()
 
+# Agrega esto justo después de los imports
+st.markdown("""
+<style>
+    /* Ocultar avatar del usuario, corona y barra de herramientas */
+    .st-emotion-cache-1r1k0y8 { display: none !important; }  /* Oculta la corona y avatar */
+    .st-emotion-cache-1b7s5q1 { display: none !important; }  /* Oculta la barra superior con foto */
+    .stToolbar { display: none !important; }                  /* Oculta toda la toolbar de Streamlit */
+    .stDeployButton { display: none !important; }             /* Oculta botón Deploy rojo */
+    .stAppView .main .block-container { padding-top: 1rem; }  /* Ajusta padding para que quede limpio */
+</style>
+""", unsafe_allow_html=True)
+
 API_KEY = os.getenv("OPENAI_API_KEY")
 if not API_KEY:
     st.error("Falta OPENAI_API_KEY en .env")
