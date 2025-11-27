@@ -17,79 +17,50 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# ==================== CSS MEJORADO - ELIMINAR TODO + INPUT FUNCIONAL ====================
+# ==================== CSS NUCLEAR - ELIMINAR TODO Y BOTÓN VISIBLE ====================
 st.markdown("""
 <style>
-    /* === ELIMINAR ELEMENTOS STREAMLIT === */
-    header, [data-testid="stHeader"] {display: none !important;}
-    footer, [data-testid="stToolbar"] {display: none !important;}
-    [data-testid="stDeployButton"] {display: none !important;}
+    /* === ELIMINACIÓN RADICAL DE ELEMENTOS STREAMLIT === */
+    header, [data-testid="stHeader"] {
+        display: none !important;
+        height: 0px !important;
+        visibility: hidden !important;
+    }
     
-    /* === ELIMINAR AVATARES COMPLETAMENTE === */
+    footer, [data-testid="stToolbar"], [data-testid="stDeployButton"] {
+        display: none !important;
+        visibility: hidden !important;
+    }
+    
+    /* === ELIMINAR COMPLETAMENTE AVATARES Y CORONAS === */
     [data-testid="stChatMessage"] [data-testid="stAvatar"],
     [data-testid="stChatMessage"] img,
     [data-testid="stChatMessage"] svg,
     [data-testid="stChatInput"] [data-testid="stAvatar"],
     [data-testid="stChatInput"] img,
-    [data-testid="stChatInput"] svg {
+    [data-testid="stChatInput"] svg,
+    .stChatMessage img,
+    .stChatMessage svg {
         display: none !important;
         width: 0px !important;
         height: 0px !important;
         visibility: hidden !important;
+        opacity: 0 !important;
     }
     
-    /* === CORREGIR INPUT DE CHAT - VERSIÓN SIMPLIFICADA === */
-    [data-testid="stChatInput"] {
-        position: fixed !important;
-        bottom: 0 !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        width: 90% !important;
-        max-width: 800px !important;
-        background: #0e1117 !important;
-        padding: 1rem !important;
-        border-top: 1px solid #333 !important;
-        z-index: 9999 !important;
-    }
-    
-    [data-testid="stChatInput"] > div {
-        background: #1e1e1e !important;
-        border: 1px solid #444 !important;
-        border-radius: 25px !important;
-        padding: 8px !important;
-    }
-    
-    [data-testid="stChatInput"] textarea {
-        background: transparent !important;
-        color: white !important;
-        border: none !important;
-        padding: 8px 12px !important;
-    }
-    
-    [data-testid="stChatInput"] textarea:focus {
-        outline: none !important;
-        border: none !important;
-        box-shadow: none !important;
-    }
-    
-    [data-testid="stChatInput"] button {
-        background: #ea580c !important;
-        border: none !important;
-        border-radius: 50% !important;
-    }
-    
-    /* === ESTILOS DE LA APLICACIÓN === */
+    /* === CONTENEDOR PRINCIPAL CON ESPACIO PARA INPUT === */
     .main .block-container {
         max-width: 800px;
         margin: 0 auto;
         padding: 1rem;
-        padding-bottom: 100px !important;
+        padding-bottom: 120px !important; /* Espacio extra para input fijo */
     }
     
     .stApp {
         background-color: #0e1117 !important;
     }
     
+    /* === ESTILOS VISUALES === */
     .header-box {
         background: linear-gradient(90deg, #ea580c, #c2410c);
         padding: 2rem;
@@ -97,6 +68,7 @@ st.markdown("""
         text-align: center;
         color: white;
         margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(234,88,12,0.4);
     }
     
     .user-msg {
@@ -106,6 +78,7 @@ st.markdown("""
         padding: 14px 20px;
         margin: 12px 0 12px auto;
         max-width: 75%;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.4);
     }
     
     .assistant-msg {
@@ -115,6 +88,7 @@ st.markdown("""
         padding: 14px 20px;
         margin: 12px auto 12px 0;
         max-width: 75%;
+        box-shadow: 0 4px 15px rgba(249,115,22,0.5);
     }
     
     .footer {
@@ -124,24 +98,101 @@ st.markdown("""
         padding: 2rem 0;
     }
     
+    /* === SOLUCIÓN CRÍTICA: INPUT PERSONALIZADO CON BOTÓN === */
+    .custom-input-container {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #0e1117;
+        padding: 1rem;
+        border-top: 1px solid #333;
+        z-index: 10000;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .custom-input-wrapper {
+        display: flex;
+        gap: 10px;
+        width: 90%;
+        max-width: 800px;
+        align-items: center;
+    }
+    
+    .custom-text-input {
+        flex: 1;
+        background: #1e1e1e;
+        color: white;
+        border: 1px solid #444;
+        border-radius: 25px;
+        padding: 12px 20px;
+        font-size: 16px;
+        outline: none;
+    }
+    
+    .custom-text-input:focus {
+        border-color: #ea580c;
+        box-shadow: 0 0 0 2px rgba(234, 88, 12, 0.2);
+    }
+    
+    .custom-send-button {
+        background: #ea580c;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+    
+    .custom-send-button:hover {
+        background: #c2410c;
+    }
+    
+    /* Responsive */
     @media (max-width: 768px) {
-        [data-testid="stChatInput"] {
-            width: 95% !important;
+        .custom-input-wrapper {
+            width: 95%;
         }
+        
         .user-msg, .assistant-msg {
             max-width: 85%;
+        }
+        
+        .header-box {
+            padding: 1.5rem;
         }
     }
 </style>
 
+<!-- JAVASCRIPT PARA ELIMINAR ELEMENTOS PERSISTENTES -->
 <script>
-// JavaScript para eliminar elementos persistentes
-setTimeout(() => {
-    // Eliminar avatares
-    document.querySelectorAll('[data-testid="stAvatar"]').forEach(el => el.remove());
+function eliminarElementosNoDeseados() {
+    // Eliminar cualquier avatar residual
+    const avatares = document.querySelectorAll('[data-testid="stAvatar"], img, svg');
+    avatares.forEach(el => {
+        if (el.parentElement && el.closest('[data-testid="stChatMessage"]')) {
+            el.remove();
+        }
+    });
+    
     // Eliminar elementos del header
-    document.querySelectorAll('header').forEach(el => el.remove());
-}, 100);
+    document.querySelectorAll('header, [data-testid="stHeader"]').forEach(el => {
+        el.remove();
+    });
+}
+
+// Ejecutar múltiples veces
+setTimeout(eliminarElementosNoDeseados, 100);
+setTimeout(eliminarElementosNoDeseados, 500);
+setInterval(eliminarElementosNoDeseados, 1000);
 </script>
 """, unsafe_allow_html=True)
 
@@ -166,7 +217,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ==================== CHAT FUNCTIONALITY ====================
+# ==================== CHAT CON INPUT PERSONALIZADO ====================
 # Initialize chat history
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -178,19 +229,59 @@ for message in st.session_state.messages:
     else:
         st.markdown(f'<div class="assistant-msg">{message["content"]}</div>', unsafe_allow_html=True)
 
-# Chat input - ESTA ES LA PARTE CRÍTICA
-user_input = st.chat_input("Escribe tu consulta aquí...")
+# ==================== INPUT PERSONALIZADO CON BOTÓN ====================
+st.markdown("""
+<div class="custom-input-container">
+    <div class="custom-input-wrapper">
+        <input type="text" class="custom-text-input" id="customChatInput" placeholder="Escribe tu consulta aquí..." />
+        <button class="custom-send-button" onclick="sendCustomMessage()">➤</button>
+    </div>
+</div>
 
-if user_input:
+<script>
+function sendCustomMessage() {
+    const input = document.getElementById('customChatInput');
+    const message = input.value.trim();
+    
+    if (message) {
+        // Usar Streamlit's set_query_params para enviar el mensaje
+        const url = new URL(window.location);
+        url.searchParams.set('user_message', message);
+        window.history.pushState({}, '', url);
+        
+        // Recargar la página para procesar el mensaje
+        window.location.reload();
+    }
+}
+
+// Permitir enviar con Enter
+document.getElementById('customChatInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        sendCustomMessage();
+    }
+});
+
+// Focus en el input al cargar
+document.getElementById('customChatInput').focus();
+</script>
+""", unsafe_allow_html=True)
+
+# ==================== PROCESAR MENSAJES DESDE URL ====================
+# Obtener mensaje de los query parameters
+query_params = st.experimental_get_query_params()
+user_message = query_params.get("user_message", [None])[0]
+
+if user_message and user_message != st.session_state.get("last_processed_message", ""):
+    st.session_state.last_processed_message = user_message
+    
     # Add user message to chat history
-    st.session_state.messages.append({"role": "user", "content": user_input})
+    st.session_state.messages.append({"role": "user", "content": user_message})
     
     # Display user message
-    st.markdown(f'<div class="user-msg">{user_input}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="user-msg">{user_message}</div>', unsafe_allow_html=True)
     
     # Display assistant response
     with st.spinner("Pensando..."):
-        # Simulate processing time
         time.sleep(1)
         
         # Get AI response
@@ -204,9 +295,9 @@ if user_input:
                         "messages": [
                             {
                                 "role": "system", 
-                                "content": "Eres un asistente de RR.HH. de Nutrisco. Responde de manera profesional y cercana."
+                                "content": "Eres un asistente de RR.HH. de Nutrisco. Responde de manera profesional y cercana. Para temas delicados, deriva a Belén Bastías."
                             },
-                            {"role": "user", "content": user_input}
+                            {"role": "user", "content": user_message}
                         ],
                         "temperature": 0.7,
                         "max_tokens": 500
@@ -222,10 +313,10 @@ if user_input:
     # Add assistant response to chat history
     st.session_state.messages.append({"role": "assistant", "content": assistant_response})
     
-    # Display assistant response
-    st.markdown(f'<div class="assistant-msg">{assistant_response}</div>', unsafe_allow_html=True)
+    # Clear query parameters
+    st.experimental_set_query_params()
     
-    # Rerun to clear input and show new messages
+    # Rerun to show new messages
     st.rerun()
 
 # Footer
