@@ -104,6 +104,21 @@ css_code = '''
         border-radius: 15px !important;
         text-align: center !important;
     }
+
+    /* OCULTAR CONTENEDOR DEL INPUT DE CHAT */
+    [data-testid="stChatInput"] > div > div > div {
+        display: none !important;
+    }
+
+    /* OCULTAR AVATARES EN MENSAJES */
+    [data-testid="stChatMessage"] > div > img,
+    [data-testid="stChatMessage"] > div > svg,
+    [data-testid="stChatMessage"] > div > [data-testid="stAvatar"] {
+        display: none !important;
+        visibility: hidden !important;
+        width: 0 !important;
+        height: 0 !important;
+    }
 </style>
 '''
 
@@ -124,7 +139,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Input personalizado (sin avatar)
-user_input = st.text_input("Escribe tu consulta aquí...", placeholder="Escribe tu consulta aquí...", key="chat_input")
+user_input = st.text_input("Escribe tu consulta aquí...", placeholder="", key="chat_input")
 
 if user_input:
     # Mensaje del usuario
