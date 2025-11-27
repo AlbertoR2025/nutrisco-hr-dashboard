@@ -10,11 +10,14 @@ load_dotenv()
 # Agrega esto justo después de los imports
 st.markdown("""
 <style>
-    /* Ocultar avatar del usuario, corona y barra de herramientas */
+    /* Ocultar avatar del usuario, corona y barra de herramientas en chat */
     .st-emotion-cache-1r1k0y8 { display: none !important; }  /* Oculta la corona y avatar */
     .st-emotion-cache-1b7s5q1 { display: none !important; }  /* Oculta la barra superior con foto */
     .stToolbar { display: none !important; }                  /* Oculta toda la toolbar de Streamlit */
     .stDeployButton { display: none !important; }             /* Oculta botón Deploy rojo */
+    .st-emotion-cache-1f3q5l2 { display: none !important; } /* Avatar del usuario en chat */
+    .st-emotion-cache-1p0r8n3 { display: none !important; } /* Corona y badge */
+    .st-emotion-cache-1q2s4t5 { display: none !important; } /* Botón de herramientas adicionales */
     .stAppView .main .block-container { padding-top: 1rem; }  /* Ajusta padding para que quede limpio */
 </style>
 """, unsafe_allow_html=True)
