@@ -140,7 +140,7 @@ try:
     st.markdown("<h3 class='section-title'>Colaboradores con Más Consultas</h3>", unsafe_allow_html=True)
     st.dataframe(kpis['ranking_empleados'].head(10), use_container_width=True, hide_index=True)
 
-            # ==================== ÚLTIMAS 10 CONSULTAS (100% LIMPIAS Y PROFESIONALES) ====================
+               # ==================== ÚLTIMAS 10 CONSULTAS (100% LIMPIAS Y PROFESIONALES) ====================
     st.markdown("<h3 class='section-title'>Últimas 10 Consultas Recibidas</h3>", unsafe_allow_html=True)
     
     ultimas = df.copy()
@@ -165,9 +165,7 @@ try:
 
     # Tabla final
     tabla = ultimas[['Fecha', 'Colaborador', 'Tema', 'Estado']].copy()
-
-    # OPCIONAL: ocultar filas sin colaborador (recomendado para que quede súper limpio)
-    tabla = tabla[tabla['Colaborador'] != ""]
+    tabla = tabla[tabla['Colaborador'] != ""]  # Oculta filas sin colaborador
 
     st.dataframe(
         tabla,
@@ -180,12 +178,15 @@ try:
         }
     )
 
-    # ==================== FOOTER ====================
-   # ==================== FOOTER (SIEMPRE SE VE, DENTRO O FUERA DEL TRY) ====================
+# ======================= FIN DEL TRY =======================
+except Exception as e:
+    st.error(f"Error al procesar datos: {e}")
+    if df is not None:
+        st.dataframe(df.head())
+
+# ======================= FOOTER CORPORATIVO (siempre visible) =======================
 st.markdown("""
-<div class="footer">
-    <p style="margin:0; font-size:0.95rem; color:#94a3b8; text-align:center; padding:1rem;">
-        Inteligencia Artificial al servicio de las personas – Nutrisco
-    </p>
+<div style="text-align:center; padding:2rem 0 1rem 0; color:#94a3b8; font-size:0.95rem;">
+    Inteligencia Artificial al servicio de las personas – Nutrisco
 </div>
 """, unsafe_allow_html=True)
