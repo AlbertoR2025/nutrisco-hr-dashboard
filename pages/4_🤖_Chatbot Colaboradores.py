@@ -141,10 +141,12 @@ if pregunta := st.chat_input("Escribe tu consulta aquí..."):
     st.rerun()   # ← ESTA ES LA LÍNEA CORRECTA
 
 # Footer
+# Footer limpio y corporativo (solo Nutrisco)
 st.markdown("""
 <div class="footer">
-    Desarrollado por Luis Reyes © 2025<br>
-    Inteligencia Artificial al servicio de las personas – Nutrisco
+    <p style="margin:0; font-size:0.95rem; color:#94a3b8;">
+        Inteligencia Artificial al servicio de las personas – Nutrisco
+    </p>
 </div>
 """, unsafe_allow_html=True)
 
